@@ -1,0 +1,94 @@
+#!/bin/sh
+# Pre-commit gate for posts. See AGENTS.md ("Process and review gate").
+#
+# Runs only when the commit touches posts/<slug>.md. Two stages:
+#   1. Fast script checks (no AI): wiring, files exist, no template placeholders.
+#   2. The post-reviewer agent through headless Claude Code (`claude -p`), which
+#      uses your logged-in Claude Code account. DECLINED blocks the commit.
+#
+# Skip only the AI review:  SKIP_POST_REVIEW=1 git commit ...
+# Skip everything:          git commit --no-verify   (don't, unless you mean it)
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+posts=$(git diff --cached --name-only --diff-filter=AM | grep -E '^posts/[^/]+\.md$')
+[ -z "$posts" ] && exit 0
+
+fail=0
+say() { printf '%s\n' "$*" >&2; }
+
+# ---- Stage 1: script checks ------------------------------------------------
+for post in $posts; do
+  slug=$(basename "$post" .md)
+  say "pre-commit: checking $post"
+
+  grep -q "'$slug': 'posts/$slug.md'" post.html \
+    || { say "  FAIL [W1] post.html POSTS map has no entry for '$slug'"; fail=1; }
+
+  grep -q "p=$slug" index.html \
+    || { say "  FAIL [W2] index.html has no card linking to p=$slug"; fail=1; }
+
+  # Link preview assets (made by scripts/MakeShare.java).
+  [ -f "share/$slug.html" ] \
+    || { say "  FAIL [W6] share/$slug.html missing (run: java scripts/MakeShare.java $slug ...)"; fail=1; }
+  [ -f "posts/images/og-$slug.png" ] \
+    || { say "  FAIL [W6] posts/images/og-$slug.png missing (run: java scripts/MakeShare.java $slug ...)"; fail=1; }
+
+  # Every local image, video and evidence file the post references must exist.
+  for ref in $(grep -oE 'posts/(images|media|evidence)/[A-Za-z0-9._/-]+' "$post" | sort -u); do
+    [ -f "$ref" ] || { say "  FAIL [W3] referenced file missing: $ref"; fail=1; }
+  done
+
+  # Template placeholders left behind: "[ ]" or <Capitalised text>.
+  if hits=$(grep -nE '\[ \]|<[A-Z][^>]*>' "$post"); then
+    say "  FAIL [W4] placeholder-like text remains:"
+    printf '%s\n' "$hits" | sed 's/^/    /' >&2
+    fail=1
+  fi
+done
+
+if [ "$fail" -ne 0 ]; then
+  say ""
+  say "pre-commit: BLOCKED by script checks. Fix the items above and commit again."
+  exit 1
+fi
+
+# ---- Stage 2: post-reviewer agent -------------------------------------------
+if [ -n "$SKIP_POST_REVIEW" ]; then
+  say "pre-commit: SKIP_POST_REVIEW set, skipping the AI review."
+  exit 0
+fi
+
+if ! command -v claude >/dev/null 2>&1; then
+  say "pre-commit: BLOCKED. 'claude' is not on the PATH, so the review cannot run."
+  say "  Install Claude Code, or run with SKIP_POST_REVIEW=1 to skip the AI review."
+  exit 1
+fi
+
+for post in $posts; do
+  say "pre-commit: post-reviewer is reviewing $post (this takes a minute or two)..."
+  out=$(claude -p \
+    "Use the post-reviewer agent to review $post. Reply with the agent's full report, and make the first line exactly the VERDICT line." \
+    --allowedTools "Agent" "Read" "Grep" "Glob" "WebFetch" "Bash(git *)" "Bash(ls *)" "Bash(grep *)" \
+    < /dev/null 2>&1)
+  status=$?
+
+  first=$(printf '%s\n' "$out" | grep -m1 -E '^VERDICT: (APPROVED|DECLINED)')
+  printf '%s\n' "$out" >&2
+
+  if [ "$first" = "VERDICT: APPROVED" ]; then
+    say "pre-commit: $post APPROVED."
+  elif [ "$first" = "VERDICT: DECLINED" ]; then
+    say ""
+    say "pre-commit: DECLINED $post. Commit blocked."
+    say "  Fix the reasons above (ask Claude to run the post-fixer agent), then commit again."
+    exit 1
+  else
+    say ""
+    say "pre-commit: BLOCKED. No VERDICT line from the reviewer (claude exit code $status)."
+    say "  Treating a review that did not finish as not approved. Re-run, or SKIP_POST_REVIEW=1."
+    exit 1
+  fi
+done
+
+exit 0

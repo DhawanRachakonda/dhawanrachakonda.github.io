@@ -7,6 +7,13 @@
 
 <One short paragraph: what the POC is, what was compared or tried, and why.>
 
+## What this post explains, and why
+
+- **What:** <The topic and scope.>
+- **Why:** <The question or problem that prompted it.>
+- **After reading you will understand:** <2 to 4 concrete takeaways; the body must deliver each.>
+- **Not covered:** <What this post does not claim or test.>
+
 ## 1. Measured
 
 | | <Option A> | <Option B> |
@@ -27,6 +34,10 @@
 ## 3. What I learned
 
 - <Lesson, with a source if it is a factual claim.>
+
+## Not proven
+
+- <What was not tested, and what would change the conclusion.>
 
 ## Worth watching (experimental)
 
