@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Is Java really too heavy for GenAI? | Dhawan Rachakonda</title>
+  <meta name="description" content="Same Spring Boot 4 + Spring AI code on the JVM and as a GraalVM native image: numbers, setup and sources.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="./">Dhawan Rachakonda</a>
+      <div class="links">
+        <a href="https://github.com/DhawanRachakonda">GitHub</a>
+      </div>
+    </nav>
+    <a class="back" href="./">← All writing</a>
+    <article id="post"><p>Loading…</p></article>
+    <footer>© Dhawan Rachakonda</footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script>
+    // Only known post names are allowed, so ?p= can never load arbitrary files.
+    const POSTS = { 'java-genai-proof': 'posts/java-genai-proof.md' };
+    const slug = new URLSearchParams(location.search).get('p') || 'java-genai-proof';
+    const el = document.getElementById('post');
+    const path = POSTS[slug];
+    if (!path) {
+      el.textContent = 'Post not found.';
+    } else {
+      fetch(path)
+        .then((r) => { if (!r.ok) throw new Error(); return r.text(); })
+        .then((md) => {
+          el.innerHTML = marked.parse(md);
+          el.querySelectorAll('a').forEach((a) => { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+        })
+        .catch(() => { el.textContent = 'Could not load this post.'; });
+    }
+  </script>
+</body>
+</html>
