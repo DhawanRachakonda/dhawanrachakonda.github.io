@@ -1,0 +1,7 @@
+ffprobe of posts/media/demo-source-branch.mp4 (the FFmpeg 6.1 image jrottenberg/ffmpeg:6.1-alpine, run in Docker), 2026-11-16:
+codec_name=h264
+width=1280
+height=720
+duration=68.000000
+size=459564
+(the video is made of 680 frames at 10 per second, as printed by scripts/media/RenderFrames.java: 'wrote 680 frames (68.0 seconds)')

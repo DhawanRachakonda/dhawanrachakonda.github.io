@@ -34,8 +34,8 @@ publish mode `pull-request` and the stub as the command.
 
 ## Result
 
-All five tests pass (E1 to E9; E1 to E7 run once for each sample project: Spring Boot, Node.js and Python, which are files only, no build tool was run). Breaking the code once (skipping the local-changes confirmation) made the second test fail; it was restored and passes.
-The full gate, `java scripts/Verify.java --live`, is recorded in [../../docs/evidence/source-branch-verify-live.txt](../../docs/evidence/source-branch-verify-live.txt).
+All five tests pass (E1 to E9; the recorded `Verify --live` run in docs/evidence is after this parameterization; E1 to E7 run once for each sample project: Spring Boot, Node.js and Python, which are files only, no build tool was run). Breaking the code once (skipping the local-changes confirmation) made the second test fail; it was restored and passes.
+The full gate, `java scripts/Verify.java --live`, is recorded in [source-branch-verify-live.txt](source-branch-verify-live.txt).
 
 Defects this work found by running it, fixed in the same change:
 
@@ -43,8 +43,15 @@ Defects this work found by running it, fixed in the same change:
 2. An unattended engine could start an askpass or credential dialog (`GIT_ASKPASS`, the machine's credential helper); `GitRunner` now removes those and a test that
    points git at a refusing remote runs without the machine's git configuration.
 3. The first version of the Docker helper ran `port` instead of `docker port` and leaked containers when a start failed; it now removes a container it cannot use.
+4. **`--unsafe-local-changes` failed in every repository that has the kit.** `appmod init` puts `.appmod/` in `.gitignore`, and the snapshot excluded the agent's
+   folder with a pathspec; git refuses a pathspec that names an ignored path (`The following paths are ignored by one of your .gitignore files`, exit 1), and the
+   session ended `ERROR` with only git's first line, a line-ending warning, as the reason. The unit tests and the first end-to-end test missed it because their
+   repositories had no such `.gitignore`. It was found by a real run of the engine jar (see
+   [source-branch-real-engine-run.txt](source-branch-real-engine-run.txt)). Fixed: the snapshot adds everything and then removes
+   `.appmod` from the temporary index; a failure's reason now shows git's own error line; regression tests in `SourceBranchTest`, and the end-to-end test's repository
+   now ignores `.appmod/` as a real one does.
 
 ## Not covered
 
-A hosted git service, `gh`, `glab`, a real coding agent in this flow (the agent's behaviour has its own recorded runs in [../../docs/evidence.md](../../docs/evidence.md)),
-and a Linux machine: this was run on Windows 11 with Docker Desktop (Linux engine). The `live` job in CI (Ubuntu) has not run yet, because nothing was pushed.
+A hosted git service, `gh`, `glab`, a real coding agent in this flow (the agent's behaviour has its own recorded runs in [docs/evidence.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/docs/evidence.md)),
+a terminal console (the real-run file uses the engine with its console off), and a Linux machine: this was run on Windows 11 with Docker Desktop (Linux engine). The `live` job in CI (Ubuntu, Docker) has since run on GitHub in pull request 1 and passed (see ci-pull-request-1.txt).

@@ -1,7 +1,8 @@
 Change: source-branch-and-pull-request. Command: java scripts/Verify.java --live (NATS_SERVER_EXE not set: the live tests started their NATS server in Docker, image nats:2.10-alpine).
 Machine: Windows 11, JDK 25, Docker Desktop (Linux engine), 2026-11-15. Git remote: a local bare repository. No hosted git service, gh or glab was used.
-Engine test results read from engine/build/test-results after this run: 515 tests, 5 skipped (the opt-in window tests), 0 failures, 0 errors.
-Live/e2e classes of this run, none skipped: NatsLiveTest 1, NatsAuthLiveTest 4, ReportPublisherLiveTest 3, SourceBranchEndToEndTest 3; also BranchPublisherTest 16, GitPreflightParityTest 8, SampleRepositoriesTest 13, SourceBranchTest 19.
+This is the last full run, made after every code change of the change (including the fix for .appmod being ignored by git).
+Engine test results read from engine/build/test-results after this run: 520 tests, 5 skipped (all in WindowLauncherTest: the opt-in window tests), 0 failures, 0 errors.
+Live/e2e classes of this run, none skipped: NatsLiveTest 1, NatsAuthLiveTest 4, ReportPublisherLiveTest 3, SourceBranchEndToEndTest 5; also BranchPublisherTest 16, GitPreflightParityTest 8, SampleRepositoriesTest 13, SourceBranchTest 22.
 ---- output of the command ----
 == kit: installer tests
   ok    default: nothing under .claude and no CLAUDE.md
@@ -165,7 +166,7 @@ PASS  a file that is not in the repository is refused
 PASS  every bad location is listed in one run
 PASS  a directory in place of a source file is refused
 PASS  a repository directory that does not exist is refused
-SKIP  symlink escape check: symbolic links cannot be created here (java.nio.file.AccessDeniedException: C:\Users\Dhawan\AppData\Local\Temp\security-audit-tests-6568455102349075303\repo-symlink\src\main\java\app\UserDao.java)
+SKIP  symlink escape check: symbolic links cannot be created here (java.nio.file.AccessDeniedException: C:\Users\Dhawan\AppData\Local\Temp\security-audit-tests-12422604728251853121\repo-symlink\src\main\java\app\UserDao.java)
 PASS  no findings: exit 0
 PASS  no findings: header row only, with BOM and CRLF
 PASS  no findings: summary counts are zero
@@ -196,7 +197,7 @@ PASS  findings: a file of exactly the size limit is read
 PASS  findings: a file one byte over the limit is refused
 PASS  findings: a directory is not a regular file
 PASS  findings: a missing file is said to be unreadable
-SKIP  findings: a symbolic link is refused (this account cannot create symbolic links: C:\Users\Dhawan\AppData\Local\Temp\validator-tests-56615180942287627\link-findings.json)
+SKIP  findings: a symbolic link is refused (this account cannot create symbolic links: C:\Users\Dhawan\AppData\Local\Temp\validator-tests-14096110976279156286\link-findings.json)
 PASS  findings: no argument prints the usage and exits 1
 PASS  ledger: invalid UTF-8 is refused
 PASS  ledger: an overlong UTF-8 sequence is refused
@@ -204,7 +205,7 @@ PASS  ledger: a file of exactly the size limit is read
 PASS  ledger: a file one byte over the limit is refused
 PASS  ledger: a directory is not a regular file
 PASS  ledger: a missing file is said to be unreadable
-SKIP  ledger: a symbolic link is refused (this account cannot create symbolic links: C:\Users\Dhawan\AppData\Local\Temp\validator-tests-56615180942287627\link-ledger.json)
+SKIP  ledger: a symbolic link is refused (this account cannot create symbolic links: C:\Users\Dhawan\AppData\Local\Temp\validator-tests-14096110976279156286\link-ledger.json)
 PASS  ledger: no argument prints the usage and exits 1
 PASS  a number prints as JavaScript prints it: 0
 PASS  a number prints as JavaScript prints it: 0
@@ -379,8 +380,8 @@ PASS  ValidateRun: --skill-dir names the folder of the validators
 > Task :compileJava UP-TO-DATE
 > Task :processResources UP-TO-DATE
 > Task :classes UP-TO-DATE
-> Task :resolveMainClassName
-> Task :bootJar
+> Task :resolveMainClassName UP-TO-DATE
+> Task :bootJar UP-TO-DATE
 > Task :jar
 > Task :assemble
 > Task :compileTestJava UP-TO-DATE
@@ -389,18 +390,18 @@ PASS  ValidateRun: --skill-dir names the folder of the validators
 OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
 > Task :test
 
-2026-11-15T22:40:46.308+05:30  INFO 62144 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-15 - Shutdown initiated...
-2026-11-15T22:40:46.321+05:30  INFO 62144 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-15 - Shutdown completed.
-2026-11-15T22:40:46.323+05:30  INFO 62144 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-16 - Shutdown initiated...
-2026-11-15T22:40:46.323+05:30  INFO 62144 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-16 - Shutdown completed.
-2026-11-15T22:40:46.325+05:30  INFO 62144 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-28 - Shutdown initiated...
-2026-11-15T22:40:46.325+05:30  INFO 62144 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-28 - Shutdown completed.
+2026-11-15T23:42:06.929+05:30  INFO 32708 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-15 - Shutdown initiated...
+2026-11-15T23:42:06.939+05:30  INFO 32708 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-15 - Shutdown completed.
+2026-11-15T23:42:06.941+05:30  INFO 32708 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-16 - Shutdown initiated...
+2026-11-15T23:42:06.941+05:30  INFO 32708 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-16 - Shutdown completed.
+2026-11-15T23:42:06.943+05:30  INFO 32708 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-28 - Shutdown initiated...
+2026-11-15T23:42:06.943+05:30  INFO 32708 --- [subscriber-engine] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-28 - Shutdown completed.
 
 > Task :check
 > Task :build
 
-BUILD SUCCESSFUL in 14m 16s
-8 actionable tasks: 4 executed, 4 up-to-date
+BUILD SUCCESSFUL in 15m 32s
+8 actionable tasks: 2 executed, 6 up-to-date
 Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.0/userguide/configuration_cache_enabling.html
 == intel-service: build and tests
 > Task :compileJava UP-TO-DATE
@@ -462,12 +463,12 @@ Consider enabling configuration cache to speed up this build: https://docs.gradl
 Totals: 10 passed, 0 failed (10 items)
 
 Verification summary
-  kit: installer tests                     PASSED                       95s
-  kit: git step of appmod init tests       PASSED                       92s
-  kit: security-audit tool tests           PASSED                       106s
-  kit: security-audit validator tests      PASSED                       41s
-  kit: security-fixer tool tests           PASSED                       206s
-  engine: build and tests                  PASSED                       856s
+  kit: installer tests                     PASSED                       94s
+  kit: git step of appmod init tests       PASSED                       98s
+  kit: security-audit tool tests           PASSED                       107s
+  kit: security-audit validator tests      PASSED                       42s
+  kit: security-fixer tool tests           PASSED                       213s
+  engine: build and tests                  PASSED                       933s
   intel-service: build and tests           PASSED                       2s
   openspec: validate specs --strict        PASSED                       1s
 READY: every check passed or was skipped for a stated reason.
