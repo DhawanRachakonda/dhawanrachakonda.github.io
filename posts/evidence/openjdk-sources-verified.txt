@@ -1,0 +1,60 @@
+Fetched with curl on 2026-11-15 (these pages return 403 to some automated fetch tools). Lines are extracted text from each page.
+
+=== https://openjdk.org/jeps/529
+HTTP 200
+JEP 529: Vector API (Eleventh Incubator)
+ JEP 529: Vector API (Eleventh Incubator)OwnerXueming ShenTypeFeatureScopeJDKStatusClosed / DeliveredRelease26Componentcore-libsDiscussionpanama dash dev at openjdk dot orgEffortXSDurationXSRelates toJEP 508: Vector API (Tenth Incubator)JEP 537: Vector API (Tw
+Introduce an API to express vector computations that reliably compile at runtime
+superior to equivalent scalar computations.
+We here propose to re-incubate the Vector API in JDK 26 without substantial
+The Vector API will incubate until necessary features of Project Valhalla
+
+=== https://openjdk.org/jeps/537
+HTTP 200
+JEP 537: Vector API (Twelfth Incubator)
+ JEP 537: Vector API (Twelfth Incubator)OwnerXueming ShenTypeFeatureScopeJDKStatusClosed / DeliveredRelease27Componentcore-libsDiscussionpanama dash dev at openjdk dot orgEffortXSDurationXSRelates toJEP 529: Vector API (Eleventh Incubator)Reviewed byEmanuel Pe
+Introduce an API to express vector computations that reliably compile at run
+performance superior to equivalent scalar computations. This is an incubating
+We here propose to re-incubate the Vector API in JDK 27 without API change. The bundled SLEEF library used for ARM and RISC-V vector math intrinsics has been updated from version 3.6.1 to version 3.9.0.
+The Vector API will incubate until necessary features of Project Valhalla
+
+=== https://openjdk.org/projects/babylon
+HTTP 200
+Babylon’s primary goal is to extend the reach of Java to foreign programming models such as SQL, differentiable programming, machine learning models, and GPUs. Babylon will achieve this with an enhancement to reflective programming in Java, called code refle
+
+=== https://openjdk.org/projects/babylon/articles/hat-matmul/hat-matmul
+HTTP 200
+One of the foreign programming environments we are exploring in the project Babylon is the GPU environment through the CUDA and OpenCL programming models, called HAT ( Heterogeneous Accelerator Toolkit). The goal for HAT is to be able to offload and run effici
+A Kernel-Context Layer: this abstraction represents the code to be offloaded to the GPUs. These are Java methods that express the work to be done per thread (as in a GPU thread), similar to CUDA and OpenCL. To do so, HAT also exposes a KernelContext object, wh
+The parallelization constructs of many the programming languages are in 1D (one dimensional), and this includes Java. However, some parallel programming models (e.g., CUDA and OpenCL) exposes multidimensional constructs to facilitate representation of parallel
+In a nutshell, GPU coalesced memory accesses occur when consecutive threads within a warp access consecutive memory locations, minimizing cache misses. A warp is a fundamental unit of execution on NVIDIA GPUs, representing a set of 32 threads that run in paral
+The performance of matrix operations is heavily dictated by the memory layout, and specifically whether elements are stored in row-major or column-major order. Programming languages like CUDA and OpenCL uses row-major memory layout to store n-dimensional array
+In HAT, we can exploit the different levels of the GPU’s memory hierarchy. Similarly to CUDA and OpenCL, HAT can allocate data (potentially arrays, but it could be any other compatible data structures) into the shared memory of the GPU.
+Comparing HAT vs Native CUDA cuBLAS
+
+=== https://builds.shipilev.net/patch-openjdk-babylon-code-reflection/hat/README.md.html
+HTTP 200
+ 19 - CUDA C/C++
+ 24 - HAT currently requires Babylon JDK, which contains the code reflection APIs.
+ 25 - A base JDK >= 26. We currently use OpenJDK 26 for development.
+157 // OpenCL/CUDA C99 code.
+
+
+---- Other sources checked with curl on 2026-11-15 ----
+=== https://www.infoq.com/news/2025/06/introducing-embabel-ai-agent
+HTTP 200
+ the Embabel Agent Framework, a pioneering platform developed by Spring founder Rod Johnson, designed to revolutionize AI applications on the JVM
+ The Embabel Agent Framework, launched by Spring founder Rod Johnson, is a new JVM-based platform for building AI-powered applications built on the 
+Rod Johnson highlighted that Embabel treats planning as a distinct capability, leveraging s
+
+=== https://www.danvega.dev/blog/embabel-1-0-ga
+HTTP 200
+0 Is Here: AI Agent Framework for Java Goes GA{"imports":{"#entry":"/_nuxt/D067m-yu
+0 Is Here: AI Agent Framework for Java Goes GA","description":"Embabel 1
+0 Is Here: AI Agent Framework for Java Goes GAEmbabel just hit 1.0.0
+
+=== https://docs.spring.io/spring-boot/how-to/native-image/developing-your-first-application.html
+HTTP 200
+$ mvn -Pnative spring-boot:build-image
+$ mvn -Pnative native:compile
+
