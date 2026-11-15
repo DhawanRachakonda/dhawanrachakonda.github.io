@@ -1,0 +1,15 @@
+Test totals, run 2026-11-15 on Windows 11 with the one command every change must pass: java scripts/Verify.java --live (NATS_SERVER_EXE set, so the engine's live NATS tests ran).
+
+## the summary table that command printed (the engine step took 2 s because Gradle reused its up-to-date result of the build just before)
+Verification summary
+  kit: installer tests                     PASSED                       67s
+  kit: security-audit tool tests           PASSED                       94s
+  kit: security-audit validator tests      PASSED                       39s
+  kit: security-fixer tool tests           PASSED                       202s
+  engine: build and tests                  PASSED                       2s
+  intel-service: build and tests           PASSED                       87s
+  openspec: validate specs --strict        PASSED                       1s
+READY: every check passed or was skipped for a stated reason.
+
+## totals from the individual runs earlier the same day
+engine: {"tests":410,"failures":0,"errors":0} (clean build with -Pwindow-tests -Pnats-tests); installer 69 passed; security-audit tools 75 passed, 1 skipped; validators 57 checks; security-fixer tools 124 passed
