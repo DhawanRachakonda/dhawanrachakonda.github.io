@@ -8,6 +8,27 @@
 
 The idea: scanners already produce reports, and agents already fix code, but nobody wants an agent writing into their working copy or pushing. The engine sits between them. It listens on NATS, creates a worktree and a branch `appmod/fix-<id8>` for each report, starts the agent with an allow-list of commands, and leaves you a branch with `.appmod/result.json` and `summary.md` to review. Everything below was run on Windows 11 with Copilot CLI 1.0.109 (app modernization plugin 1.24.0) and Claude Code 2.1.x. These are samples I made, not vendor exports.
 
+## Start here: the files to read
+
+Repository: [github.com/DhawanRachakonda/worktree-vuln-fixer](https://github.com/DhawanRachakonda/worktree-vuln-fixer). Read in this order.
+
+| To understand | Read |
+|---|---|
+| What it is, the features, the quick start | [README.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/README.md) |
+| Run it on your machine, step by step, and where to watch a fix | [engine/docs/setup.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/engine/docs/setup.md) |
+| How each scanner (security audit, Coverity, Black Duck, any file) plugs in | [engine/docs/integrations.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/engine/docs/integrations.md) |
+| Day-to-day use: console commands, session states, restarts | [engine/docs/operations.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/engine/docs/operations.md) and [connecting.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/engine/docs/connecting.md) |
+| The data the engine keeps (sessions, events) | [engine/docs/data-model.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/engine/docs/data-model.md) |
+| The agents, skills and tools that are installed into the repository to be fixed | [kit/README.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/kit/README.md) and [kit/docs/](https://github.com/DhawanRachakonda/worktree-vuln-fixer/tree/main/kit/docs) |
+| The vulnerability-intelligence service and its MCP tool | [intel-service/README.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/intel-service/README.md) and [docs](https://github.com/DhawanRachakonda/worktree-vuln-fixer/tree/main/intel-service/docs) |
+| Every requirement the system must meet, as OpenSpec specs | [openspec/specs/](https://github.com/DhawanRachakonda/worktree-vuln-fixer/tree/main/openspec/specs) |
+| Which test or recorded run proves each requirement | [engine/docs/spec-coverage.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/engine/docs/spec-coverage.md) and [docs/evidence.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/docs/evidence.md) |
+| Change it: layout, how to add a scanner, a console command or an agent, the PR checklist | [CONTRIBUTING.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/CONTRIBUTING.md) |
+| Rules for coding agents (and people) before a commit or push | [AGENTS.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/AGENTS.md) and [scripts/Verify.java](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/scripts/Verify.java) |
+| The demo videos and what in them is live | [docs/media/README.md](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/docs/media/README.md) |
+
+Where the code is: the engine in [engine/src/main/java/dev/subscriber](https://github.com/DhawanRachakonda/worktree-vuln-fixer/tree/main/engine/src/main/java/dev/subscriber) (`nats` intake, `worktree`, `runner`, `lifecycle`, `console`, `api`), its settings and the list of subjects in [application.yml](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/engine/src/main/resources/application.yml), the installer in [kit/install/KitInstaller.java](https://github.com/DhawanRachakonda/worktree-vuln-fixer/blob/main/kit/install/KitInstaller.java), the agents in [kit/.github/agents](https://github.com/DhawanRachakonda/worktree-vuln-fixer/tree/main/kit/.github/agents), and the intel service in [intel-service/src](https://github.com/DhawanRachakonda/worktree-vuln-fixer/tree/main/intel-service/src).
+
 ## 1. What I tried
 
 | Run | Agent | Result | Proof |
@@ -41,8 +62,20 @@ What is live and what is a replay: the console panes in the Claude video are the
 ## 2. How it works
 
 ```
-scanner report --publish--> NATS subject --> engine --> git worktree + branch appmod/fix-<id8>
-                                                    --> Copilot CLI or Claude Code (allow-list) --> commits + result.json + summary.md
+ report (CSV or JSON)
+   |  publish <file>  (console or NATS)
+   v
+ NATS subject --> engine
+                    |
+                    v
+   git worktree + branch appmod/fix-<id8>
+                    |
+                    v
+   Copilot CLI or Claude Code (allow-list)
+                    |
+                    v
+   commits + result.json + summary.md
+   --> you review the branch
 ```
 
 - **Subjects** map a kind of report to an agent: `securityaudit.issuefixesAgent`, `coverity.issuefixesAgent`, `bdh.issuefixesAgent`. A new scanner is a few lines of YAML, no code.
