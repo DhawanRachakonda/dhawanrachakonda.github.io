@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Is Java really too heavy for GenAI? | Dhawan Rachakonda</title>
   <meta name="description" content="Same Spring Boot 4 + Spring AI code on the JVM and as a GraalVM native image: numbers, setup and sources.">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <div class="wrap">
@@ -32,7 +32,7 @@
     if (!path) {
       el.textContent = 'Post not found.';
     } else {
-      fetch(path)
+      fetch(path, { cache: 'no-cache' })
         .then((r) => { if (!r.ok) throw new Error(); return r.text(); })
         .then((md) => {
           el.innerHTML = marked.parse(md);
