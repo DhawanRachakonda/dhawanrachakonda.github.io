@@ -39,6 +39,7 @@ Where the code is: the engine in [engine/src/main/java/dev/subscriber](https://g
 | Black Duck-style report | Copilot + app modernization plugin | 2 commits, both CVEs fixed; the plugin's CVE, build and test tools were called (Copilot's own event log) | [log](posts/evidence/bdh-run.txt) |
 | Java 17 to 21 migration | Copilot + plugin | plan and 2 commits; `mvnw verify` passed on the branch (checked by hand); the agent's own report understated it | [log](posts/evidence/migration-run.txt) |
 | OpenRewrite recipe | `appmod-openrewrite` agent | recipe run, verified and committed | [log](posts/evidence/openrewrite-run.txt) |
+| Black Duck-style report, OpenRewrite path, headless allow-list | Copilot | run 1 failed (unparseable `./mvnw.cmd` and unquoted `-D`, hand edits, ERROR); after the rules went into the prompt and kit, run 2 ran two recipes with `.mvnw.cmd`, 2 commits, build and test passed. One run each way: not deterministic | [log](posts/evidence/bdh-openrewrite-run.txt) |
 | Audit with no Node on the PATH | Claude Code | validated | [log](posts/evidence/audit-no-node-run.txt) |
 | Audit calling the intel service | Claude Code | the agent queried `product: java`, last 30 days; the service answered with its freshness; it held 8 records | [log](posts/evidence/intel-service-run.txt) |
 | Audit with matching intel records | Claude Code and Copilot | on a React 19 project both agents queried the tool and received the React Server Components record (CVE-2026-126187): Claude Code recorded a `needs_validation` issue, Copilot rejected the lead for the visible code path; neither ran code | [log](posts/evidence/intel-matching-audit-run.txt) |
@@ -55,11 +56,11 @@ Claude Code: the live engine console (doctor, config, two refusals, publish, ses
 
 <video controls preload="metadata" width="100%" src="posts/media/demo-claude.mp4"></video>
 
-GitHub Copilot with app modernization and OpenRewrite: a Black Duck style report (2 commits, both CVEs fixed), a Java 17 to 21 upgrade, an OpenRewrite recipe.
+GitHub Copilot with app modernization and OpenRewrite: the live engine console with a Black Duck style report fixed in 2 commits through OpenRewrite recipes (and the failed first run that led to the quoting rules), a Java 17 to 21 upgrade, intel-service with Copilot.
 
 <video controls preload="metadata" width="100%" src="posts/media/demo-copilot.mp4"></video>
 
-What is live and what is a replay: the console panes in the Claude video are the real screens of the run (read from the console's screen buffer and drawn offscreen; the long wait is sped up 6x and says so; text in [live-console-claude-run.txt](posts/evidence/live-console-claude-run.txt)). The other terminal scenes replay the text of the recorded runs linked above at a reveal speed chosen for reading, not the original timing.
+What is live and what is a replay: the console panes in both videos are the real screens of the runs (read from the console's screen buffer and drawn offscreen; the long waits are sped up (6x in the Claude video, about 34x for the 9-minute Copilot run) and say so; text in [live-console-claude-run.txt](posts/evidence/live-console-claude-run.txt)). The other terminal scenes replay the text of the recorded runs linked above at a reveal speed chosen for reading, not the original timing.
 
 ## 2. How it works
 
