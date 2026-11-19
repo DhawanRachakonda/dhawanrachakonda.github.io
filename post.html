@@ -34,6 +34,12 @@
     // Only known post names are allowed, so ?p= can never load arbitrary files.
     const POSTS = { 'java-genai-proof': 'posts/java-genai-proof.md', 'scanner-report-to-fix-branch': 'posts/scanner-report-to-fix-branch.md', 'job-intake-agent-three-frameworks': 'posts/job-intake-agent-three-frameworks.md' };
     const slug = new URLSearchParams(location.search).get('p') || 'java-genai-proof';
+    // Short descriptions, the same text as each post's share page.
+    const DESCRIPTIONS = {
+      'java-genai-proof': 'Same Spring Boot 4 + Spring AI code on the JVM and as a GraalVM native image: numbers, setup and sources.',
+      'scanner-report-to-fix-branch': 'A NATS-driven engine that turns Coverity, Black Duck and security-audit reports into one tested commit per issue, run with Copilot and Claude Code.',
+      'job-intake-agent-three-frameworks': 'One job-description intake pipeline in LangGraph (Python), LangGraph4j with LangChain4j or Spring AI, and Embabel, with real runs against Claude and MongoDB and what is not proven.'
+    };
     const el = document.getElementById('post');
     const path = POSTS[slug];
     if (!path) {
@@ -44,6 +50,11 @@
         .then((md) => {
           el.innerHTML = marked.parse(md);
           el.querySelectorAll('a').forEach((a) => { a.target = '_blank'; a.rel = 'noopener noreferrer'; });
+          // The static <title> and description above belong to the default post, so set them from the post that loaded.
+          const h1 = el.querySelector('h1');
+          if (h1) document.title = h1.textContent + ' | Dhawan Rachakonda';
+          const desc = DESCRIPTIONS[slug];
+          if (desc) document.querySelector('meta[name="description"]').setAttribute('content', desc);
         })
         .catch(() => { el.textContent = 'Could not load this post.'; });
     }

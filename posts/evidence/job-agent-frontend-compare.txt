@@ -1,5 +1,5 @@
 # Are the three React frontends the same? 2026-11-19
-# Compared at the commits the post links: Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 7b5d055, Embabel-Job-Agent f3b79e5 (git archive of frontend/ at each commit)
+# Compared at the commits the post links: Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 0e09b4f, Embabel-Job-Agent f3b79e5 (git archive of frontend/ at each commit)
 
 ## diff -rq Langchain4j-Job-Agent vs SpringAI-Job-Agent
 (no differences)

@@ -1,7 +1,7 @@
 # Real runs of the three Java apps, 2026-11-19 (live Claude via each app's configured default model, live MongoDB Atlas)
 # Model: all three apps ran claude-sonnet-5-5, the default in each application.yml (Embabel: embabel.models.default-llm, Langchain4j: job-agent.anthropic.model, SpringAI: spring.ai.anthropic.chat.options.model, each ${ANTHROPIC_MODEL:claude-sonnet-5-5}). ANTHROPIC_MODEL was not set in the shell, and each .env contains only ANTHROPIC_API_KEY and MONGO_URI.
 # Each app used its OWN collection in the same database: Embabel jobs_embabel, Langchain4j jobs_langchain4j, SpringAI jobs_springai (the Python app's `jobs` was not touched).
-# Code state: these runs used the main sources of Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 7b5d055 and Embabel-Job-Agent f3b79e5. The commits made after the runs changed only README text, .env.example and a test-only application.yml, not main code.
+# Code state: the Embabel and Langchain4j runs used the main sources of Embabel-Job-Agent f3b79e5 and Langchain4j-Job-Agent 847e196 (later commits changed only README text, .env.example and a test-only application.yml). SpringAI was run twice: first on 7b5d055 (labelled 'earlier run' below, before the entity() change, including the Spring AI side of the isolation check) and then again on 0e09b4f, the final commit, which reads the replies with ChatClient.entity().
 # Apps were started with mvn spring-boot:run on ports 18083 (Langchain4j), 18084 (SpringAI), 18085 (Embabel); requests via POST /chat.
 # Secrets (API key, Mongo URI) are in git-ignored .env files and appear nowhere in this record. Job ids are MongoDB ObjectIds.
 
@@ -85,7 +85,7 @@ Status: published
 - publish_job: job_id=6afece833b20ae86e25f5f48
 Published job_id: 6afece833b20ae86e25f5f48
 
-### SpringAI: complete JD  (real-sai-1.json)
+### SpringAI (earlier run, 7b5d055): complete JD  (real-sai-1.json)
 done=True thread_id=None
 Status: published
 - parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs SaiCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
@@ -98,17 +98,17 @@ Status: published
 - publish_job: job_id=6afece41fe94a43b1d189fc4
 Published job_id: 6afece41fe94a43b1d189fc4
 
-### SpringAI: same JD again  (real-sai-2.json)
+### SpringAI (earlier run, 7b5d055): same JD again  (real-sai-2.json)
 done=True thread_id=None
 Status: rejected
 - parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs SaiCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
 - check_duplicate: duplicate_of=6afece41fe94a43b1d189fc4
 - reject: duplicate of an existing job posting
 
-### SpringAI: JD missing fields, first question  (real-sai-3a.json)
+### SpringAI (earlier run, 7b5d055): JD missing fields, first question  (real-sai-3a.json)
 question=What is the location?  thread_id=a1149f4b-508f-4e73-98b4-dd044195f892
 
-### SpringAI: after kill and restart, answer 'remote' (last answer; run completes)  (real-sai-3-remote.json)
+### SpringAI (earlier run, 7b5d055): after kill and restart, answer 'remote' (last answer; run completes)  (real-sai-3-remote.json)
 done=True thread_id=None
 Status: published
 - parse_jd: parsed={title=Data Scientist, company=Globex SaiCheck2, location=, exp=, work_mode=}, missing=[location, exp, work_mode]
@@ -135,7 +135,7 @@ Status: published
 - publish_job: job_id=6afeceba3b20ae86e25f5f49
 Published job_id: 6afeceba3b20ae86e25f5f49
 
-### Isolation: SpringAI receives the job Embabel already published  (real-SpringAI-isolation.json)
+### Isolation (SpringAI on 7b5d055): SpringAI receives the job Embabel already published  (real-SpringAI-isolation.json)
 done=True thread_id=None
 Status: published
 - parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs EmbCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
@@ -201,3 +201,52 @@ Data Scientist wanted at Globex <COMPANY>. Build forecasting models and work wit
 Status: rejected
 - check_duplicate: duplicate_of=6afeccfa69a35c3ec556f3da
 # (6afeccfa69a35c3ec556f3da is the job id that Embabel published in the first run above, so its own collection still held the original.)
+
+
+# ===== Final Spring AI runs on commit 0e09b4f (ChatClient.entity()), 2026-11-19 =====
+# Request texts: the COMPLETE text below with company 'Initech Labs SaiEntity1', and the missing-fields text with company 'Globex SaiEntity2'. The model's extraction in this run returned the company as 'Initech Labs' (it dropped the suffix), so the stored job has that name.
+
+### SpringAI 0e09b4f: complete JD  (real-sai-e1.json)
+done=True
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 72/100 (critique in the full reply at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 91/100 (critique in the full reply at the end of this file)
+- publish_job: job_id=6afedaa7e387e6aaa6b8a8c0
+Published job_id: 6afedaa7e387e6aaa6b8a8c0
+
+### SpringAI 0e09b4f: same JD again  (real-sai-e2.json)
+done=True
+Status: rejected
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=6afedaa7e387e6aaa6b8a8c0
+- reject: duplicate of an existing job posting
+
+### SpringAI 0e09b4f: JD missing fields, first question  (real-sai-e3a.json)
+question=What is the location?  thread_id=69d24bda-2cf3-44d0-8171-f68ef931a793
+
+### SpringAI 0e09b4f: after kill and restart, answer 'remote' (last answer; run completes)  (real-sai-e3-remote.json)
+done=True
+Status: published
+- parse_jd: parsed={title=Data Scientist, company=Globex SaiEntity2, location=, exp=, work_mode=}, missing=[location, exp, work_mode]
+- request_missing_info: got 'location' from the recruiter
+- request_missing_info: got 'exp' from the recruiter
+- request_missing_info: got 'work_mode' from the recruiter
+- check_duplicate: duplicate_of=None
+- score_quality: 38/100 (critique in the full reply at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 90/100 (critique in the full reply at the end of this file)
+- publish_job: job_id=6afedad9aa58eefcb3df806e
+Published job_id: 6afedad9aa58eefcb3df806e
+
+## Full reply, SpringAI 0e09b4f complete JD
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 72/100 - The role is clear on tech stack, seniority, location, hybrid policy, and responsibilities, and the language is neutral and free of biased wording. It loses points for the stray 'SaiEntity1' artifact, the vague 'competitive salary' with no range, and the lack of detail on team, success metrics, and the 'improve reliability' goal.
+- rewrite_jd: revision #1
+- score_quality: 91/100 - The description is clear and specific, with team composition, concrete success metrics, a salary range, and a defined hybrid arrangement. The language is largely bias-free, and the inclusive closing statement helps. Minor gaps: the benefits wording (spouse, children, parents) is slightly narrow in framing, and the on-call expectations and the interview process are not described.
+- publish_job: job_id=6afedaa7e387e6aaa6b8a8c0
+Published job_id: 6afedaa7e387e6aaa6b8a8c0
