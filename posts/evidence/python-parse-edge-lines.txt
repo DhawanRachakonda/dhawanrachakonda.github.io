@@ -1,0 +1,14 @@
+# Python original, jd_intake_pipeline.py at commit 8497a27 (raw file from GitHub, line numbers added), fetched 2026-11-19
+# https://raw.githubusercontent.com/alumnx-ai-labs/Langgraph-Job-Agent/8497a27/jd_intake_pipeline.py
+
+## lines 124-126: route_after_parse can return only two values
+124: def route_after_parse(state: JDState) -> str:
+125:     """Plain Python, not an LLM decision: are required fields present at all?"""
+126:     return "request_missing_info" if state["missing_fields"] else "check_duplicate"
+
+## lines 271-275: the graph still declares a parse_jd -> escalate edge
+271:     graph.add_conditional_edges("parse_jd", route_after_parse, {
+272:         "request_missing_info": "request_missing_info",
+273:         "escalate": "escalate",
+274:         "check_duplicate": "check_duplicate",
+275:     })

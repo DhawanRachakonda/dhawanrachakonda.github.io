@@ -1,0 +1,35 @@
+# Reads secrets from the environment, or from a local .env file (KEY=value lines) if present.
+spring:
+  config:
+    import: "optional:file:.env[.properties]"
+  main:
+    banner-mode: "off"
+  datasource:
+    url: jdbc:h2:file:./data/embabel-snapshots;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password: ""
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:com/embabel/agent/jdbc/schema.sql
+
+  web:
+    resources:
+      # The React app: build it with `cd frontend && npm install && npm run build`.
+      static-locations: "file:frontend/dist/,classpath:/static/"
+
+server:
+  address: 127.0.0.1
+  port: ${PORT:8080}
+
+embabel:
+  models:
+    default-llm: ${ANTHROPIC_MODEL:claude-sonnet-5-5}
+  agent:
+    platform:
+      # A process paused for the recruiter is snapshotted to the database, so it can be
+      # resumed after a restart (the Embabel counterpart of SqliteSaver + thread_id).
+      persistence:
+        enabled: true
+        provider: jdbc
+        checkpoint-policy: WAITING

@@ -1,0 +1,48 @@
+# Exact passages from the Embabel Agent guide 1.5.4 cited in the post, checked 2026-11-19
+# Source: https://docs.embabel.com/embabel-agent/guide/1.5.4/ (a single page of about 2.9 MB; each entry gives the section number and its anchor).
+# The page header reads 'Embabel Agent Release: 1.5.4'. Passages were found by downloading the page and searching its text.
+
+## 1.3.1  https://docs.embabel.com/embabel-agent/guide/1.5.4/#sophisticated-planning
+"introducing a true planning step, using a non-LLM AI algorithm"
+
+## 1.3.2  https://docs.embabel.com/embabel-agent/guide/1.5.4/#superior-extensibility-and-reuse
+"without editing FSM definitions or existing code"
+
+## 4.9.7  https://docs.embabel.com/embabel-agent/guide/1.5.4/#reference.tools__agentic-tools
+"These provide deterministic, typesafe planning that is far more powerful and predictable than LLM-driven orchestration."
+
+## 4.17.4  https://docs.embabel.com/embabel-agent/guide/1.5.4/#configuration-2
+"WAITING or LIFECYCLE. Default LIFECYCLE."
+
+## 4.17.7  https://docs.embabel.com/embabel-agent/guide/1.5.4/#current-limitations
+"The snapshot factory supports InMemoryBlackboard and assumes the predominant case of exactly one pending awaitable per WAITING process."
+
+## 4.21.1  https://docs.embabel.com/embabel-agent/guide/1.5.4/#how-states-work-with-goap
+"Re-plans from the new state"
+
+## 4.21.1  https://docs.embabel.com/embabel-agent/guide/1.5.4/#how-states-work-with-goap
+"Hides previous state objects"
+
+## 4.21.4  https://docs.embabel.com/embabel-agent/guide/1.5.4/#looping-states-2
+"For looping patterns where an action may return to a previously-visited state type, use clearBlackboard = true on the looping action"
+
+## 4.21.9  https://docs.embabel.com/embabel-agent/guide/1.5.4/#human-in-the-loop-with-waitfor
+"A form is generated based on the HumanFeedback record structure"
+
+## 4.21.9  https://docs.embabel.com/embabel-agent/guide/1.5.4/#human-in-the-loop-with-waitfor
+"Upon submission, the HumanFeedback instance is created and added to the blackboard"
+
+## 4.21.9  https://docs.embabel.com/embabel-agent/guide/1.5.4/#human-in-the-loop-with-waitfor
+"The agent process enters a WAITING state"
+
+# LangGraph4j README, https://github.com/langgraph4j/langgraph4j (raw README, line 8 and line 9):
+"LangGraph for Java. A library for building stateful, multi-agents applications with LLMs, built for work with [langchain4j] and [Spring AI]"
+"It is inspired by [LangGraph] solution, part of [LangChain AI project]."
+
+## 4.38.7  https://docs.embabel.com/embabel-agent/guide/1.5.4/#relationship-with-other-validation-mechanisms
+"The Agent API framework supports Jakarta Bean Validation (JSR-380) for domain object constraints. These constraints are injected into the schema and validated during object construction."
+
+
+## 4.25.6  https://docs.embabel.com/embabel-agent/guide/1.5.4/#reference.llms.native-structured-output (Advanced Feature: Native Structured Output)
+"Embabel generates the JSON Schema, decides whether the native path is enabled for a call, and parses the final response into the requested object."
+"Anthropic native structured output is currently disabled by default until its semantics are verified."

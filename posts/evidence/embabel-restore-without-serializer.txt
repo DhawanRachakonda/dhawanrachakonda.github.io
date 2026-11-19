@@ -1,0 +1,11 @@
+# Embabel 1.5.4: restoring a paused run WITHOUT the FormRequestSerializer workaround, 2026-11-19
+# Setup: copy of Embabel-Job-Agent commit 7a2a21b with src/main/java/jobagent/FormRequestSerializer.java deleted; ran: mvn test -Dtest=PersistenceRestartTest
+# Excerpt of the Maven output (summary lines, then the first stack trace lines):
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 8.946 s <<< FAILURE! -- in jobagent.PersistenceRestartTest
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+[INFO] BUILD FAILURE
+exit 1
+181:com.embabel.agent.core.persistence.AgentProcessPersistenceException: Cannot deserialize blackboard value of type [com.embabel.agent.core.hitl.FormBindingRequest]
+--
+191:Caused by: tools.jackson.module.kotlin.KotlinInvalidNullException: Instantiation of [simple type, class com.embabel.agent.core.hitl.FormBindingRequest] value failed for JSON property form due to missing (therefore NULL) value for creator parameter form which is a non-nullable type
+192: at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte offset: #587] (through reference chain: com.embabel.agent.core.hitl.FormBindingRequest["form"])

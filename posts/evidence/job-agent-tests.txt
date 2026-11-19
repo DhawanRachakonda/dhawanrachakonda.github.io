@@ -1,0 +1,54 @@
+# Offline test runs of the three Java ports (mvn -B -ntp test), run 2026-11-19
+# Runtime JDK: openjdk version "26.0.1" 2026-04-21; projects compile for Java 21
+# Commits: Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 7b5d055, Embabel-Job-Agent f3b79e5 (the same commits the post links)
+# The model is faked (scripted fake ChatModel / ChatClient, or Embabel's Mockito test support); the job store is in-memory.
+# The two Spring Boot test configs deliberately do not import the local .env, so no real key or Mongo URI reaches the tests.
+# No real Claude or MongoDB calls are made by these tests.
+
+## Langchain4j-Job-Agent
+[INFO] Running jobagent.ChatControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.070 s -- in jobagent.ChatControllerTest
+[INFO] Running jobagent.JdIntakePipelineTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.546 s -- in jobagent.JdIntakePipelineTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+## SpringAI-Job-Agent
+[INFO] Running jobagent.ChatControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.439 s -- in jobagent.ChatControllerTest
+[INFO] Running jobagent.JdIntakePipelineTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.579 s -- in jobagent.JdIntakePipelineTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+## Embabel-Job-Agent
+[INFO] Running jobagent.JdIntakeAgentTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.759 s -- in jobagent.JdIntakeAgentTest
+[INFO] Running jobagent.PersistenceRestartTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.080 s -- in jobagent.PersistenceRestartTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+## Test method names
+Langchain4j-Job-Agent: chatAsksOneFieldAtATimeThenPublishes
+Langchain4j-Job-Agent: completeJdIsPublished
+Langchain4j-Job-Agent: anApiFailureIsNotMistakenForAnEmptyExtraction
+Langchain4j-Job-Agent: duplicateIsRejected
+Langchain4j-Job-Agent: missingFieldsAreAskedOneAtATime
+Langchain4j-Job-Agent: pausedRunSurvivesAProcessRestart
+Langchain4j-Job-Agent: poorQualityRewritesTwiceThenEscalates
+Langchain4j-Job-Agent: tooManyQuestionsEscalates
+SpringAI-Job-Agent: chatAsksOneFieldAtATimeThenPublishes
+SpringAI-Job-Agent: completeJdIsPublished
+SpringAI-Job-Agent: anApiFailureIsNotMistakenForAnEmptyExtraction
+SpringAI-Job-Agent: duplicateIsRejected
+SpringAI-Job-Agent: missingFieldsAreAskedOneAtATime
+SpringAI-Job-Agent: pausedRunSurvivesAProcessRestart
+SpringAI-Job-Agent: poorQualityRewritesTwiceThenEscalates
+SpringAI-Job-Agent: tooManyQuestionsEscalates
+Embabel-Job-Agent: completeJdIsPublished
+Embabel-Job-Agent: duplicateIsRejected
+Embabel-Job-Agent: missingFieldsPauseForTheRecruiterThenContinue
+Embabel-Job-Agent: poorQualityRewritesTwiceThenEscalates
+Embabel-Job-Agent: chatEndpointContract
+Embabel-Job-Agent: pausedRunCanBeResumedByAFreshApplicationContext

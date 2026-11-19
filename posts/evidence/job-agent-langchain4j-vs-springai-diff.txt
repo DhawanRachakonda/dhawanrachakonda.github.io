@@ -1,0 +1,142 @@
+# Langchain4j-Job-Agent (847e196) vs SpringAI-Job-Agent (7b5d055): which source files differ, 2026-11-19
+# Produced with: diff -rq on git archives of src/ and pom.xml at those commits
+
+## diff -rq
+Files lc/pom.xml and sai/pom.xml differ
+Files lc/src/main/java/jobagent/JdIntakePipeline.java and sai/src/main/java/jobagent/JdIntakePipeline.java differ
+Files lc/src/main/java/jobagent/JobAgentConfig.java and sai/src/main/java/jobagent/JobAgentConfig.java differ
+Files lc/src/main/resources/application.yml and sai/src/main/resources/application.yml differ
+Files lc/src/test/java/jobagent/ChatControllerTest.java and sai/src/test/java/jobagent/ChatControllerTest.java differ
+Files lc/src/test/java/jobagent/JdIntakePipelineTest.java and sai/src/test/java/jobagent/JdIntakePipelineTest.java differ
+Files lc/src/test/resources/application.yml and sai/src/test/resources/application.yml differ
+
+## main files with no difference
+src/main/java/jobagent/ChatController.java
+src/main/java/jobagent/InMemoryJobStore.java
+src/main/java/jobagent/JdState.java
+src/main/java/jobagent/JobAgentApplication.java
+src/main/java/jobagent/JobStore.java
+src/main/java/jobagent/MongoJobStore.java
+
+## JdIntakePipeline.java from 'buildGraph' to the end of the file (graph assembly, run loop, checkpointer, formatResult)
+identical in both (92 lines)
+
+## per-node comparison inside JdIntakePipeline (same = identical text)
+same:      routeAfterParse
+same:      requestMissingInfo
+same:      routeAfterRequestMissingInfo
+same:      checkDuplicate
+same:      routeAfterDuplicateCheck
+same:      routeAfterScore
+same:      publishJob
+same:      Map<String, Object> reject
+same:      Map<String, Object> escalate
+different: parseJd
+different: scoreQuality
+different: rewriteJd
+
+## diff -u of the two Spring Boot context tests and the unit tests
+--- lc/src/test/java/jobagent/JdIntakePipelineTest.java	2026-11-19 16:04:29.000000000 +0530
++++ sai/src/test/java/jobagent/JdIntakePipelineTest.java	2026-11-19 16:04:32.000000000 +0530
+@@ -1,10 +1,11 @@
+ package jobagent;
+ 
+-import dev.langchain4j.data.message.AiMessage;
+-import dev.langchain4j.data.message.UserMessage;
+-import dev.langchain4j.model.chat.ChatModel;
+-import dev.langchain4j.model.chat.request.ChatRequest;
+-import dev.langchain4j.model.chat.response.ChatResponse;
++import org.springframework.ai.chat.client.ChatClient;
++import org.springframework.ai.chat.messages.AssistantMessage;
++import org.springframework.ai.chat.model.ChatModel;
++import org.springframework.ai.chat.model.ChatResponse;
++import org.springframework.ai.chat.model.Generation;
++import org.springframework.ai.chat.prompt.Prompt;
+ import org.bsc.langgraph4j.CompiledGraph;
+ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.api.io.TempDir;
+@@ -19,12 +20,12 @@
+ /** Offline tests: a scripted fake model and an in-memory store, real LangGraph4j + SQLite checkpoints. */
+ class JdIntakePipelineTest {
+ 
+-    /** Fake Claude: answers based on which prompt it receives. */
+-    static ChatModel fakeLlm(String parseJson, Function<String, String> scorer) {
+-        return new ChatModel() {
++    /** Fake Claude: a Spring AI ChatModel that answers based on which prompt it receives. */
++    static ChatClient fakeLlm(String parseJson, Function<String, String> scorer) {
++        ChatModel model = new ChatModel() {
+             @Override
+-            public ChatResponse doChat(ChatRequest request) {
+-                String prompt = ((UserMessage) request.messages().get(0)).singleText();
++            public ChatResponse call(Prompt request) {
++                String prompt = request.getContents();
+                 String reply;
+                 if (prompt.startsWith("Extract")) {
+                     reply = parseJson;
+@@ -33,19 +34,20 @@
+                 } else {
+                     reply = "A clearer, rewritten job description.";
+                 }
+-                return ChatResponse.builder().aiMessage(AiMessage.from(reply)).build();
++                return new ChatResponse(java.util.List.of(new Generation(new AssistantMessage(reply))));
+             }
+         };
++        return ChatClient.create(model);
+     }
+ 
+     static final String FULL = "{\"title\":\"Backend Engineer\",\"company\":\"Acme\",\"location\":\"Bangalore\","
+-            + "\"exp\":\"5+ years\",\"work_mode\":\"hybrid\"}";
++            + "\"exp\":\"5+ years\",\"workMode\":\"hybrid\"}";
+     static final String PARTIAL = "{\"title\":\"Backend Engineer\",\"company\":\"Acme\",\"location\":\"\","
+-            + "\"exp\":\"\",\"work_mode\":\"\"}";
++            + "\"exp\":\"\",\"workMode\":\"\"}";
+     static final Function<String, String> GOOD = p -> "```json\n{\"score\": 90, \"feedback\": \"clear\"}\n```";
+     static final Function<String, String> BAD = p -> "{\"score\": 40, \"feedback\": \"vague\"}";
+ 
+-    private CompiledGraph<JdState> graph(Path dir, ChatModel llm, JobStore store) throws Exception {
++    private CompiledGraph<JdState> graph(Path dir, ChatClient llm, JobStore store) throws Exception {
+         return new JdIntakePipeline(llm, store).buildGraph(JdIntakePipeline.checkpointer(dir.resolve("cp.sqlite").toString()));
+     }
+ 
+@@ -62,11 +64,11 @@
+     void anApiFailureIsNotMistakenForAnEmptyExtraction(@TempDir Path dir) throws Exception {
+         ChatModel broken = new ChatModel() {
+             @Override
+-            public ChatResponse doChat(ChatRequest request) {
++            public ChatResponse call(Prompt request) {
+                 throw new IllegalStateException("401 invalid x-api-key");
+             }
+         };
+-        var g = graph(dir, broken, new InMemoryJobStore());
++        var g = graph(dir, ChatClient.create(broken), new InMemoryJobStore());
+         var ex = org.junit.jupiter.api.Assertions.assertThrows(Exception.class,
+                 () -> JdIntakePipeline.start(g, "any jd", "t-api-failure"));
+         assertTrue(String.valueOf(ex).contains("401 invalid x-api-key") || String.valueOf(ex.getCause()).contains("401"));
+--- lc/src/test/java/jobagent/ChatControllerTest.java	2026-11-19 16:04:29.000000000 +0530
++++ sai/src/test/java/jobagent/ChatControllerTest.java	2026-11-19 16:04:32.000000000 +0530
+@@ -1,6 +1,6 @@
+ package jobagent;
+ 
+-import dev.langchain4j.model.chat.ChatModel;
++import org.springframework.ai.chat.client.ChatClient;
+ import org.junit.jupiter.api.Test;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.boot.test.context.SpringBootTest;
+@@ -28,7 +28,7 @@
+     static class Fakes {
+         @Bean
+         @Primary
+-        ChatModel fakeChatModel() {
++        ChatClient fakeChatClient() {
+             return JdIntakePipelineTest.fakeLlm(JdIntakePipelineTest.PARTIAL, JdIntakePipelineTest.GOOD);
+         }
+ 
+@@ -42,7 +42,7 @@
+     static void props(DynamicPropertyRegistry registry) throws Exception {
+         Path dir = Files.createTempDirectory("chat-controller-test");
+         registry.add("job-agent.checkpoint-db", () -> dir.resolve("cp.sqlite").toString());
+-        registry.add("job-agent.anthropic.api-key", () -> "test-key-not-used");
++        registry.add("spring.ai.anthropic.api-key", () -> "test-key-not-used");
+     }
+ 
+     @Autowired
