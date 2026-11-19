@@ -1,6 +1,6 @@
 # Offline test runs of the three Java ports (mvn -B -ntp test), run 2026-11-19
 # Runtime JDK: openjdk version "26.0.1" 2026-04-21; projects compile for Java 21
-# Commits: Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 7b5d055, Embabel-Job-Agent f3b79e5 (the same commits the post links)
+# Commits: Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 0e09b4f, Embabel-Job-Agent f3b79e5 (the same commits the post links)
 # The model is faked (scripted fake ChatModel / ChatClient, or Embabel's Mockito test support); the job store is in-memory.
 # The two Spring Boot test configs deliberately do not import the local .env, so no real key or Mongo URI reaches the tests.
 # No real Claude or MongoDB calls are made by these tests.
@@ -15,9 +15,9 @@
 
 ## SpringAI-Job-Agent
 [INFO] Running jobagent.ChatControllerTest
-[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.439 s -- in jobagent.ChatControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.653 s -- in jobagent.ChatControllerTest
 [INFO] Running jobagent.JdIntakePipelineTest
-[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.579 s -- in jobagent.JdIntakePipelineTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.598 s -- in jobagent.JdIntakePipelineTest
 [INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
 [INFO] BUILD SUCCESS
 

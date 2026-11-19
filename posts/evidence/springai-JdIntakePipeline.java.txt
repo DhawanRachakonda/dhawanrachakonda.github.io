@@ -1,7 +1,6 @@
 package jobagent;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.converter.BeanOutputConverter;
 import org.bsc.langgraph4j.CompileConfig;
 import org.bsc.langgraph4j.CompiledGraph;
 import org.bsc.langgraph4j.GraphInput;
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
@@ -34,7 +34,6 @@ import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
  */
 public class JdIntakePipeline {
 
-    static final List<String> REQUIRED_FIELDS = List.of("title", "company", "location", "exp", "work_mode");
     static final int QUALITY_THRESHOLD = 75;
     static final int MAX_REVISIONS = 2;
     /** Fields are asked one at a time, so this is a total-question cap, not a round cap. */
@@ -61,48 +60,41 @@ public class JdIntakePipeline {
     // ─── Nodes ────────────────────────────────────────────────────────────────
 
     /** The model's answer to the extraction prompt; Spring AI maps the reply onto this record. */
-    record ExtractedFields(String title, String company, String location, String exp, String workMode) {}
+    record ExtractedFields(String title, String company, String location, String exp, String workMode) {
+
+        /** The values by field name, in the order the recruiter is asked. */
+        Map<String, String> asMap() {
+            Map<String, String> m = new LinkedHashMap<>();
+            m.put("title", Objects.toString(title, ""));
+            m.put("company", Objects.toString(company, ""));
+            m.put("location", Objects.toString(location, ""));
+            m.put("exp", Objects.toString(exp, ""));
+            m.put("work_mode", Objects.toString(workMode, ""));
+            return m;
+        }
+    }
 
     /** The model's answer to the scoring prompt. */
     record QualityScore(int score, String feedback) {}
 
-    private static final BeanOutputConverter<ExtractedFields> EXTRACT = new BeanOutputConverter<>(ExtractedFields.class);
-    private static final BeanOutputConverter<QualityScore> SCORE = new BeanOutputConverter<>(QualityScore.class);
-
     Map<String, Object> parseJd(JdState state) {
-        // No field list here: the ExtractedFields record's schema is appended by the converter (EXTRACT.getFormat()).
+        // No field list here: entity() maps the reply onto ExtractedFields, so the type says what to extract.
         String prompt = "Extract the job posting details from the job description below. Use an empty string for "
                 + "anything it does not clearly mention.\n\n"
                 + "Job description:\n" + state.rawJd();
-        // An API failure (bad key, network) propagates. Only a reply that can't be read as the
-        // record is treated as "nothing extracted", so the recruiter is asked for every field.
-        String reply = llm.prompt().user(prompt + "\n\n" + EXTRACT.getFormat()).call().content();
-        ExtractedFields f;
-        try {
-            f = EXTRACT.convert(reply);
-        } catch (Exception e) {
-            f = new ExtractedFields("", "", "", "", "");
-        }
+        // An API failure (bad key, network) or a reply that cannot be read as the record throws, so the run
+        // fails loudly instead of looking like an empty extraction.
+        ExtractedFields f = llm.prompt().user(prompt).call().entity(ExtractedFields.class);
 
-        Map<String, String> parsed = new LinkedHashMap<>();
-        parsed.put("title", clean(f == null ? null : f.title()));
-        parsed.put("company", clean(f == null ? null : f.company()));
-        parsed.put("location", clean(f == null ? null : f.location()));
-        parsed.put("exp", clean(f == null ? null : f.exp()));
-        parsed.put("work_mode", clean(f == null ? null : f.workMode()));
-
+        Map<String, String> parsed = f.asMap();
         List<String> missing = new ArrayList<>();
-        for (String field : REQUIRED_FIELDS) {
-            if (parsed.get(field).isEmpty()) {
+        parsed.forEach((field, value) -> {
+            if (value.isBlank()) {
                 missing.add(field);
             }
-        }
+        });
         return update("parse_jd: parsed=" + parsed + ", missing=" + missing,
                 Map.of("parsed", parsed, "missing_fields", missing));
-    }
-
-    private static String clean(String s) {
-        return s == null ? "" : s.strip();
     }
 
     String routeAfterParse(JdState state) {
@@ -148,19 +140,10 @@ public class JdIntakePipeline {
         String prompt = "Score this job description from 0-100 on clarity, specificity, and "
                 + "bias-free language, with a 1-2 sentence critique as feedback.\n\n"
                 + "Job description:\n" + state.currentDraft();
-        String reply = llm.prompt().user(prompt + "\n\n" + SCORE.getFormat()).call().content();
-        int score;
-        String feedback;
-        try {
-            QualityScore q = SCORE.convert(reply);
-            score = q.score();
-            feedback = q.feedback() == null ? "" : q.feedback();
-        } catch (Exception e) {
-            score = 0;
-            feedback = "Could not parse a quality score from the model's reply.";
-        }
-        return update("score_quality: " + score + "/100 - " + feedback,
-                Map.of("quality_score", score, "quality_feedback", feedback));
+        QualityScore q = llm.prompt().user(prompt).call().entity(QualityScore.class);
+        String feedback = Objects.toString(q.feedback(), "");
+        return update("score_quality: " + q.score() + "/100 - " + feedback,
+                Map.of("quality_score", q.score(), "quality_feedback", feedback));
     }
 
     /** The threshold and revision cap are fixed rules, not LLM discretion. */

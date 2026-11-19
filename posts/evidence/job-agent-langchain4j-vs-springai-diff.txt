@@ -1,4 +1,4 @@
-# Langchain4j-Job-Agent (847e196) vs SpringAI-Job-Agent (7b5d055): which source files differ, 2026-11-19
+# Langchain4j-Job-Agent (847e196) vs SpringAI-Job-Agent (0e09b4f): which source files differ, 2026-11-19
 # Produced with: diff -rq on git archives of src/ and pom.xml at those commits
 
 ## diff -rq
@@ -35,9 +35,9 @@ different: parseJd
 different: scoreQuality
 different: rewriteJd
 
-## diff -u of the two Spring Boot context tests and the unit tests
+## diff -u of the test sources
 --- lc/src/test/java/jobagent/JdIntakePipelineTest.java	2026-11-19 16:04:29.000000000 +0530
-+++ sai/src/test/java/jobagent/JdIntakePipelineTest.java	2026-11-19 16:04:32.000000000 +0530
++++ sai/src/test/java/jobagent/JdIntakePipelineTest.java	2026-11-19 16:46:22.000000000 +0530
 @@ -1,10 +1,11 @@
  package jobagent;
  
@@ -113,7 +113,7 @@ different: rewriteJd
                  () -> JdIntakePipeline.start(g, "any jd", "t-api-failure"));
          assertTrue(String.valueOf(ex).contains("401 invalid x-api-key") || String.valueOf(ex.getCause()).contains("401"));
 --- lc/src/test/java/jobagent/ChatControllerTest.java	2026-11-19 16:04:29.000000000 +0530
-+++ sai/src/test/java/jobagent/ChatControllerTest.java	2026-11-19 16:04:32.000000000 +0530
++++ sai/src/test/java/jobagent/ChatControllerTest.java	2026-11-19 16:46:22.000000000 +0530
 @@ -1,6 +1,6 @@
  package jobagent;
  

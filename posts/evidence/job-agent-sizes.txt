@@ -1,5 +1,5 @@
 # Line counts (wc -l), 2026-11-19. Comments, blank lines are included, so this is a rough size, not a quality measure.
-# Commits counted: Langgraph-Job-Agent 8497a27, Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 7b5d055, Embabel-Job-Agent f3b79e5
+# Commits counted: Langgraph-Job-Agent 8497a27, Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 0e09b4f, Embabel-Job-Agent f3b79e5
 
 ## Python original
   355 Langgraph-Job-Agent/jd_intake_pipeline.py
@@ -21,13 +21,13 @@
 ## SpringAI-Job-Agent (main Java)
    59 SpringAI-Job-Agent/src/main/java/jobagent/ChatController.java
    30 SpringAI-Job-Agent/src/main/java/jobagent/InMemoryJobStore.java
-  291 SpringAI-Job-Agent/src/main/java/jobagent/JdIntakePipeline.java
+  274 SpringAI-Job-Agent/src/main/java/jobagent/JdIntakePipeline.java
    54 SpringAI-Job-Agent/src/main/java/jobagent/JdState.java
    11 SpringAI-Job-Agent/src/main/java/jobagent/JobAgentApplication.java
    42 SpringAI-Job-Agent/src/main/java/jobagent/JobAgentConfig.java
    14 SpringAI-Job-Agent/src/main/java/jobagent/JobStore.java
    63 SpringAI-Job-Agent/src/main/java/jobagent/MongoJobStore.java
-  564 total
+  547 total
 
 ## Embabel-Job-Agent (main Java)
    50 Embabel-Job-Agent/src/main/java/jobagent/ChatController.java
