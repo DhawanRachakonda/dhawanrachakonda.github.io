@@ -59,6 +59,20 @@ class JdIntakePipelineTest {
     }
 
     @Test
+    void anApiFailureIsNotMistakenForAnEmptyExtraction(@TempDir Path dir) throws Exception {
+        ChatModel broken = new ChatModel() {
+            @Override
+            public ChatResponse doChat(ChatRequest request) {
+                throw new IllegalStateException("401 invalid x-api-key");
+            }
+        };
+        var g = graph(dir, broken, new InMemoryJobStore());
+        var ex = org.junit.jupiter.api.Assertions.assertThrows(Exception.class,
+                () -> JdIntakePipeline.start(g, "any jd", "t-api-failure"));
+        assertTrue(String.valueOf(ex).contains("401 invalid x-api-key") || String.valueOf(ex.getCause()).contains("401"));
+    }
+
+    @Test
     void duplicateIsRejected(@TempDir Path dir) throws Exception {
         var store = new InMemoryJobStore();
         var g = graph(dir, fakeLlm(FULL, GOOD), store);

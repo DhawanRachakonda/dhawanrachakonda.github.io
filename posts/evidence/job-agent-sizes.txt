@@ -1,25 +1,46 @@
-# Line counts (wc -l), 2026-11-19. Comments, blank lines and the CLI/web code are included, so this is a rough size, not a quality measure.
+# Line counts (wc -l), 2026-11-19. Comments, blank lines are included, so this is a rough size, not a quality measure.
+
+## Python original
   355 Langgraph-Job-Agent/jd_intake_pipeline.py
+   56 Langgraph-Job-Agent/app.py
+   52 Langgraph-Job-Agent/jobs_db.py
+  463 total
+
+## Langchain4j-Job-Agent (main Java)
+   59 Langchain4j-Job-Agent/src/main/java/jobagent/ChatController.java
    30 Langchain4j-Job-Agent/src/main/java/jobagent/InMemoryJobStore.java
-  345 Langchain4j-Job-Agent/src/main/java/jobagent/JdIntakePipeline.java
+  291 Langchain4j-Job-Agent/src/main/java/jobagent/JdIntakePipeline.java
    54 Langchain4j-Job-Agent/src/main/java/jobagent/JdState.java
+   11 Langchain4j-Job-Agent/src/main/java/jobagent/JobAgentApplication.java
+   42 Langchain4j-Job-Agent/src/main/java/jobagent/JobAgentConfig.java
    14 Langchain4j-Job-Agent/src/main/java/jobagent/JobStore.java
    61 Langchain4j-Job-Agent/src/main/java/jobagent/MongoJobStore.java
-  120 Langchain4j-Job-Agent/src/main/java/jobagent/WebServer.java
+  562 total
+
+## SpringAI-Job-Agent (main Java)
+   59 SpringAI-Job-Agent/src/main/java/jobagent/ChatController.java
+   30 SpringAI-Job-Agent/src/main/java/jobagent/InMemoryJobStore.java
+  290 SpringAI-Job-Agent/src/main/java/jobagent/JdIntakePipeline.java
+   54 SpringAI-Job-Agent/src/main/java/jobagent/JdState.java
+   11 SpringAI-Job-Agent/src/main/java/jobagent/JobAgentApplication.java
+   40 SpringAI-Job-Agent/src/main/java/jobagent/JobAgentConfig.java
+   14 SpringAI-Job-Agent/src/main/java/jobagent/JobStore.java
+   61 SpringAI-Job-Agent/src/main/java/jobagent/MongoJobStore.java
+  559 total
+
+## Embabel-Job-Agent (main Java)
    50 Embabel-Job-Agent/src/main/java/jobagent/ChatController.java
    57 Embabel-Job-Agent/src/main/java/jobagent/FormRequestSerializer.java
    30 Embabel-Job-Agent/src/main/java/jobagent/InMemoryJobStore.java
-  114 Embabel-Job-Agent/src/main/java/jobagent/JdDomain.java
-  182 Embabel-Job-Agent/src/main/java/jobagent/JdIntakeAgent.java
+  129 Embabel-Job-Agent/src/main/java/jobagent/JdDomain.java
+  193 Embabel-Job-Agent/src/main/java/jobagent/JdIntakeAgent.java
    11 Embabel-Job-Agent/src/main/java/jobagent/JobAgentApplication.java
    17 Embabel-Job-Agent/src/main/java/jobagent/JobAgentConfig.java
    14 Embabel-Job-Agent/src/main/java/jobagent/JobStore.java
    57 Embabel-Job-Agent/src/main/java/jobagent/MongoJobStore.java
    83 Embabel-Job-Agent/src/main/java/jobagent/PipelineService.java
- 1594 total
+  641 total
 
-## Whole-project scope (all main source files)
-  355 Langgraph-Job-Agent/jd_intake_pipeline.py
-   56 Langgraph-Job-Agent/app.py
-   52 Langgraph-Job-Agent/jobs_db.py
-  463 total
+## Earlier hand-written HTTP server in Langchain4j-Job-Agent (commit a1005b3, file removed in c5dd553)
+# git show a1005b3:src/main/java/jobagent/WebServer.java | wc -l  ->  120
+# lines mentioning HttpServer in that file: 3

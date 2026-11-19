@@ -2,9 +2,7 @@ package jobagent;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.chat.ChatModel;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.bsc.langgraph4j.CompileConfig;
 import org.bsc.langgraph4j.CompiledGraph;
 import org.bsc.langgraph4j.GraphInput;
@@ -16,14 +14,10 @@ import org.bsc.langgraph4j.checkpoint.SQLiteSaver;
 import org.bsc.langgraph4j.serializer.std.ObjectStreamStateSerializer;
 import org.bsc.langgraph4j.state.StateSnapshot;
 
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.UUID;
 
 import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
@@ -31,7 +25,8 @@ import static org.bsc.langgraph4j.action.AsyncEdgeAction.edge_async;
 import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
 
 /**
- * JD Intake Pipeline - a LangGraph4j workflow with LangChain4j (Claude) for the LLM steps.
+ * JD Intake Pipeline - a LangGraph4j workflow with LangChain4j (Claude) for the LLM steps,
+ * hosted in a Spring Boot application (see JobAgentConfig and ChatController).
  *
  * Same design as the Python version: every node is a fixed step. Some are plain Java
  * (duplicate check, routing), some make one LLM call for one job (extract, score, rewrite).
@@ -241,7 +236,7 @@ public class JdIntakePipeline {
                 .build());
     }
 
-    // ─── Run loop (shared by the CLI, the web server and tests) ───────────────
+    // ─── Run loop (shared by the web controller and tests) ───────────────
 
     /** Where a run ended up: paused on a question, or finished with a final state. */
     public record RunResult(String question, JdState finalState) {
@@ -272,18 +267,6 @@ public class JdIntakePipeline {
         return new RunResult(null, state);
     }
 
-    /** Builds the production graph: Claude + Mongo + SQLite checkpoints. */
-    public static CompiledGraph<JdState> productionGraph() throws Exception {
-        Dotenv env = Dotenv.configure().ignoreIfMissing().load();
-        ChatModel llm = AnthropicChatModel.builder()
-                .apiKey(env.get("ANTHROPIC_API_KEY"))
-                .modelName(env.get("ANTHROPIC_MODEL", "claude-sonnet-5-5"))
-                .maxTokens(2048)
-                .build();
-        JobStore store = new MongoJobStore(env.get("MONGO_URI"));
-        return new JdIntakePipeline(llm, store).buildGraph(checkpointer("checkpoints.sqlite"));
-    }
-
     /** SQLite checkpoints keyed by thread id: this is what lets a paused run survive a restart. */
     public static SQLiteSaver checkpointer(String databasePath) throws Exception {
         return SQLiteSaver.builder()
@@ -293,9 +276,9 @@ public class JdIntakePipeline {
                 .build();
     }
 
-    // ─── CLI ──────────────────────────────────────────────────────────────────
+    // ─── Reply text for the chat UI ───────────────────────────────────────────
 
-    static String formatResult(JdState state) {
+    public static String formatResult(JdState state) {
         StringBuilder sb = new StringBuilder("Status: " + state.status());
         for (String line : state.log()) {
             sb.append("\n- ").append(line);
@@ -304,42 +287,5 @@ public class JdIntakePipeline {
             sb.append("\nPublished job_id: ").append(state.jobId());
         }
         return sb.toString();
-    }
-
-    public static void main(String[] args) throws Exception {
-        System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
-
-        if (args.length == 0) {
-            System.out.println("Usage: mvn -q exec:java -Dexec.args=\"<raw job description text>\"");
-            System.out.println("       mvn -q exec:java -Dexec.args=\"--resume <thread_id> <your answer>\"  (after killing a paused run)");
-            System.exit(1);
-        }
-
-        CompiledGraph<JdState> graph = productionGraph();
-        Scanner in = new Scanner(System.in, StandardCharsets.UTF_8);
-
-        RunResult result;
-        String threadId;
-        if (args[0].equals("--resume")) {
-            if (args.length < 3) {
-                System.out.println("Usage: --resume <thread_id> <your answer>");
-                System.exit(1);
-            }
-            threadId = args[1];
-            result = resume(graph, threadId, String.join(" ", List.of(args).subList(2, args.length)));
-        } else {
-            threadId = UUID.randomUUID().toString();
-            System.out.println("[thread_id: " + threadId + "]");
-            result = start(graph, String.join(" ", args), threadId);
-        }
-
-        while (result.paused()) {
-            System.out.print("\n" + result.question() + "\n> ");
-            String reply = in.hasNextLine() ? in.nextLine() : "";
-            result = resume(graph, threadId, reply);
-        }
-
-        System.out.println("\n" + formatResult(result.finalState()));
-        System.exit(0); // SQLite/HTTP clients can keep non-daemon threads alive
     }
 }

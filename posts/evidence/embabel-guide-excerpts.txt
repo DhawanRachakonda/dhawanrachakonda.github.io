@@ -38,3 +38,6 @@
 # LangGraph4j README, https://github.com/langgraph4j/langgraph4j (raw README, line 8 and line 9):
 "LangGraph for Java. A library for building stateful, multi-agents applications with LLMs, built for work with [langchain4j] and [Spring AI]"
 "It is inspired by [LangGraph] solution, part of [LangChain AI project]."
+
+## 4.38.7  https://docs.embabel.com/embabel-agent/guide/1.5.4/#relationship-with-other-validation-mechanisms
+"The Agent API framework supports Jakarta Bean Validation (JSR-380) for domain object constraints. These constraints are injected into the schema and validated during object construction."

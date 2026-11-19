@@ -1,6 +1,7 @@
 package jobagent;
 
 import com.embabel.agent.api.annotation.State;
+import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,6 +31,20 @@ public final class JdDomain {
 
     /** Structured LLM output for extraction. Empty string means "not mentioned". */
     public record ExtractedFields(String title, String company, String location, String exp, String workMode) {}
+
+    /**
+     * The five fields a job needs before it can be checked and published, as Jakarta Bean Validation
+     * constraints. The agent validates this record to find what is missing. The constraints are
+     * deliberately NOT on {@link ExtractedFields}, the type the model fills: the guide says Embabel
+     * validates constraints when it constructs an object, and a field that the job description
+     * simply does not mention is a gap to ask the recruiter about, not a malformed model reply.
+     */
+    public record RequiredFields(
+            @NotBlank String title,
+            @NotBlank String company,
+            @NotBlank String location,
+            @NotBlank String exp,
+            @NotBlank String workMode) {}
 
     /** Structured LLM output for scoring. */
     public record QualityScore(int score, String feedback) {}

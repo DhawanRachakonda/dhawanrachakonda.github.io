@@ -1,0 +1,15 @@
+# Passages cited for the other JVM options, fetched 2026-11-19
+
+## Quarkus LangChain4j  https://docs.quarkiverse.io/quarkus-langchain4j/dev/index.html
+"integrates Large Language Models (LLMs) into your Quarkus applications."  (the sidebar lists "Anthropic (Claude)" under Chat Models)
+
+## Micronaut LangChain4j  https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/
+"This module provides integration between Micronaut and Langchain4j."  (the table of contents lists Anthropic as a chat model provider)
+
+## Spring AI ChatClient  https://docs.spring.io/spring-ai/reference/api/chatclient.html
+"The `ChatClient` offers a fluent API for communicating with an AI Model."
+"You often want to return an entity class that is mapped from the returned `String`. The `entity()` method provides this functionality."
+
+## LangGraph4j README  https://raw.githubusercontent.com/langgraph4j/langgraph4j/main/README.md
+line 8: "LangGraph for Java. A library for building stateful, multi-agents applications with LLMs, built for work with [langchain4j] and [Spring AI]"
+line 417: "As default use case to proof [Spring AI] integration, We have implemented **AgentExecutor (aka ReACT Agent)** using LangGraph4j."

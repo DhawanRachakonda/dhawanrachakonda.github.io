@@ -1,0 +1,42 @@
+package jobagent;
+
+import dev.langchain4j.model.anthropic.AnthropicChatModel;
+import dev.langchain4j.model.chat.ChatModel;
+import org.bsc.langgraph4j.CompiledGraph;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+/**
+ * Wires the pieces as Spring beans: Claude through LangChain4j, the job store, and the
+ * LangGraph4j graph with SQLite checkpoints. Tests replace the model and the store.
+ */
+@Configuration
+public class JobAgentConfig {
+
+    @Bean
+    @ConditionalOnMissingBean(ChatModel.class)
+    ChatModel chatModel(@Value("${job-agent.anthropic.api-key}") String apiKey,
+                        @Value("${job-agent.anthropic.model}") String model) {
+        return AnthropicChatModel.builder()
+                .apiKey(apiKey)
+                .modelName(model)
+                .maxTokens(2048)
+                .build();
+    }
+
+    /** Only created when MONGO_URI is set; tests provide their own in-memory JobStore instead. */
+    @Bean
+    @ConditionalOnProperty(name = "MONGO_URI")
+    JobStore jobStore(@Value("${MONGO_URI}") String mongoUri) {
+        return new MongoJobStore(mongoUri);
+    }
+
+    @Bean
+    CompiledGraph<JdState> jdIntakeGraph(ChatModel chatModel, JobStore store,
+                                         @Value("${job-agent.checkpoint-db}") String checkpointDb) throws Exception {
+        return new JdIntakePipeline(chatModel, store).buildGraph(JdIntakePipeline.checkpointer(checkpointDb));
+    }
+}

@@ -8,6 +8,7 @@ import com.embabel.agent.core.hitl.WaitFor;
 import jobagent.JdDomain.Collecting;
 import jobagent.JdDomain.Draft;
 import jobagent.JdDomain.Duplicate;
+import jakarta.validation.Validator;
 import jobagent.JdDomain.Escalated;
 import jobagent.JdDomain.ExtractedFields;
 import jobagent.JdDomain.FieldAnswer;
@@ -16,6 +17,7 @@ import jobagent.JdDomain.NeedsRewrite;
 import jobagent.JdDomain.Publishable;
 import jobagent.JdDomain.QualityScore;
 import jobagent.JdDomain.RawJd;
+import jobagent.JdDomain.RequiredFields;
 import jobagent.JdDomain.Scoring;
 import jobagent.JdDomain.Stage;
 import jobagent.JdDomain.Unchecked;
@@ -24,6 +26,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static jobagent.JdDomain.MAX_MISSING_INFO_ATTEMPTS;
 import static jobagent.JdDomain.MAX_REVISIONS;
@@ -44,9 +48,11 @@ import static jobagent.JdDomain.REQUIRED_FIELDS;
 public class JdIntakeAgent {
 
     private final JobStore store;
+    private final Validator validator;
 
-    public JdIntakeAgent(JobStore store) {
+    public JdIntakeAgent(JobStore store, Validator validator) {
         this.store = store;
+        this.validator = validator;
     }
 
     // ─── Stages ───────────────────────────────────────────────────────────────
@@ -66,9 +72,14 @@ public class JdIntakeAgent {
         parsed.put("exp", clean(f.exp()));
         parsed.put("work_mode", clean(f.workMode()));
 
+        // What counts as "missing" is declared on RequiredFields with Jakarta Bean Validation (@NotBlank);
+        // REQUIRED_FIELDS only fixes the order the recruiter is asked in.
+        Set<String> blank = validator.validate(new RequiredFields(parsed.get("title"), parsed.get("company"),
+                        parsed.get("location"), parsed.get("exp"), parsed.get("work_mode")))
+                .stream().map(v -> v.getPropertyPath().toString()).collect(Collectors.toSet());
         List<String> missing = new ArrayList<>();
         for (String field : REQUIRED_FIELDS) {
-            if (parsed.get(field).isEmpty()) {
+            if (blank.contains("work_mode".equals(field) ? "workMode" : field)) {
                 missing.add(field);
             }
         }
