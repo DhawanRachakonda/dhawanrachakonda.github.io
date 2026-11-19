@@ -106,7 +106,7 @@ return graph.compile(CompileConfig.builder()
 
 The one real design difference is the pause. Python pauses from inside a node. In LangGraph4j I pause before the node: the graph stops, the HTTP layer returns the question, and the next request writes the answer into the saved state and resumes. The effect for the user is the same.
 
-**Hosting in Spring Boot.** My first version of this port ran its own small HTTP server on the JDK's built-in `HttpServer`, a 120-line [`WebServer.java`](https://github.com/DhawanRachakonda/Langchain4j-Job-Agent/blob/a1005b3/src/main/java/jobagent/WebServer.java) at commit `a1005b3` ([line count](posts/evidence/job-agent-sizes.txt)). That was reinventing something the Java ecosystem already does well, and it made this port an uneven comparison with the Embabel one, which is a Spring Boot app. The current version is a Spring Boot 4.0.9 application. The model, the job store and the compiled graph are beans in [`JobAgentConfig`](https://github.com/DhawanRachakonda/Langchain4j-Job-Agent/blob/847e196/src/main/java/jobagent/JobAgentConfig.java#L19-L43), and `/chat` is a [`ChatController`](https://github.com/DhawanRachakonda/Langchain4j-Job-Agent/blob/847e196/src/main/java/jobagent/ChatController.java#L27-L58). The Claude client bean is built like this:
+**Hosting in Spring Boot.** The port is a Spring Boot 4.0.9 application. The model, the job store and the compiled graph are beans in [`JobAgentConfig`](https://github.com/DhawanRachakonda/Langchain4j-Job-Agent/blob/847e196/src/main/java/jobagent/JobAgentConfig.java#L19-L43), and `/chat` is a [`ChatController`](https://github.com/DhawanRachakonda/Langchain4j-Job-Agent/blob/847e196/src/main/java/jobagent/ChatController.java#L27-L58). The Claude client bean is built like this:
 
 ```java
 return AnthropicChatModel.builder()
@@ -133,7 +133,7 @@ What changed:
 ExtractedFields f = llm.prompt().user(prompt).call().entity(ExtractedFields.class);
 ```
 
-My first Spring AI version called the model with `content()` and ran a `BeanOutputConverter` by hand, which was needless: `entity()` does it. I did not inspect what `entity()` adds to the request; in the real run (section 7) it extracted all five fields from a prompt that names none of them.
+I did not inspect what `entity()` adds to the request; in the real run (section 7) it extracted all five fields from a prompt that names none of them.
 
 - **Tests:** the fake model is a Spring AI `ChatModel` wrapped in a `ChatClient` ([test source](posts/evidence/springai-JdIntakePipelineTest.java.txt)). The test differences (the fake model, and the JSON key `workMode` that Spring AI maps onto the record) are in the same diff.
 
@@ -241,7 +241,6 @@ The process kill was a real one: I stopped the app's operating-system process wh
 
 - **An agent workflow is mostly ordinary control flow.** Once the rules were plain code, porting meant translating routers and state, and the LLM calls were the smallest part. That is why the language did not matter much (section 1, and the `score` excerpt in section 5).
 - **Swapping the LLM layer is a small change, if the workflow does not depend on it.** The Spring AI port differs from the LangChain4j one in the client, the structured-output parsing, the configuration and the fake model in the tests, and not in the graph (the [diff](posts/evidence/job-agent-langchain4j-vs-springai-diff.txt), section 4). That is the benefit of keeping the graph and the rules in plain code.
-- **Do not reinvent the host.** My hand-written HTTP server worked, but it made the port less representative of how a Java developer would build this (section 3). Spring Boot gave the controller, configuration and a real application context for the tests.
 - **A swallowed exception can look like a valid answer.** The first Spring AI version turned an authentication error into a question for the recruiter. A start-up check with a dummy key found it, and a test now guards it (section 4).
 - **The explicit graph is easier to see; the typed version is easier to extend.** The diagram maps one to one onto the Python and LangGraph4j wiring. In Embabel there is no diagram in the code, and I drew it from the signatures. The guide argues the other side: adding actions and goals extends the system without editing state-machine definitions ([§1.3.2](https://docs.embabel.com/embabel-agent/guide/1.5.4/#superior-extensibility-and-reuse)). I did not test extending any of them, so this is an expectation, not a result.
 - **Pause and resume is where frameworks differ most.** It took one checkpointer argument in Python, three extra settings in LangGraph4j, and a split action plus a serializer workaround in Embabel (sections 2, 3 and 5).
