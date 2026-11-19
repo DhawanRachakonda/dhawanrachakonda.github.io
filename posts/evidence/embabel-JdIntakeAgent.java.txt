@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static jobagent.JdDomain.MAX_MISSING_INFO_ATTEMPTS;
 import static jobagent.JdDomain.MAX_REVISIONS;
@@ -60,31 +58,18 @@ public class JdIntakeAgent {
     /** LLM extraction of the five required fields. */
     @Action(clearBlackboard = true)
     public Stage parse(RawJd raw, OperationContext context) {
-        String prompt = "Extract these fields from the job description below, with an empty string for any "
-                + "field that isn't clearly mentioned: title, company, location, exp, workMode.\n\n"
+        // No field list here: the output type (ExtractedFields) tells Embabel what to ask the model for.
+        String prompt = "Extract the job posting details from the job description below. Use an empty string for "
+                + "anything it does not clearly mention.\n\n"
                 + "Job description:\n" + raw.text();
-        ExtractedFields f = context.ai().withDefaultLlm().createObject(prompt, ExtractedFields.class);
+        RequiredFields fields = context.ai().withDefaultLlm()
+                .createObject(prompt, ExtractedFields.class)
+                .toRequiredFields();
 
-        Map<String, String> parsed = new LinkedHashMap<>();
-        parsed.put("title", clean(f.title()));
-        parsed.put("company", clean(f.company()));
-        parsed.put("location", clean(f.location()));
-        parsed.put("exp", clean(f.exp()));
-        parsed.put("work_mode", clean(f.workMode()));
-
-        // What counts as "missing" is declared on RequiredFields with Jakarta Bean Validation (@NotBlank);
-        // REQUIRED_FIELDS only fixes the order the recruiter is asked in.
-        Set<String> blank = validator.validate(new RequiredFields(parsed.get("title"), parsed.get("company"),
-                        parsed.get("location"), parsed.get("exp"), parsed.get("work_mode")))
-                .stream().map(v -> v.getPropertyPath().toString()).collect(Collectors.toSet());
-        List<String> missing = new ArrayList<>();
-        for (String field : REQUIRED_FIELDS) {
-            if (blank.contains("work_mode".equals(field) ? "workMode" : field)) {
-                missing.add(field);
-            }
-        }
-        Draft draft = Draft.of(raw.text()).withParsed(parsed)
-                .logged("parse_jd: parsed=" + parsed + ", missing=" + missing);
+        // What counts as "missing" is declared on RequiredFields with Jakarta Bean Validation (@NotBlank).
+        List<String> missing = fields.missing(validator);
+        Draft draft = Draft.of(raw.text()).withParsed(fields.asMap())
+                .logged("parse_jd: parsed=" + fields.asMap() + ", missing=" + missing);
         return missing.isEmpty() ? new Unchecked(draft) : new Collecting(draft, missing, 0);
     }
 
@@ -108,7 +93,7 @@ public class JdIntakeAgent {
     public Stage absorb(Collecting state, FieldAnswer answer) {
         String field = state.missing().get(0);
         Map<String, String> parsed = new LinkedHashMap<>(state.draft().parsed());
-        parsed.put(field, clean(answer.value()));
+        parsed.put(field, answer.value().strip());
         List<String> rest = new ArrayList<>(state.missing().subList(1, state.missing().size()));
         int attempts = state.attempts() + 1;
         Draft draft = state.draft().withParsed(parsed)
@@ -185,9 +170,5 @@ public class JdIntakeAgent {
 
     private static JobOutcome outcome(String status, String jobId, Draft draft) {
         return new JobOutcome(status, jobId, draft.log());
-    }
-
-    private static String clean(String s) {
-        return s == null ? "" : s.strip();
     }
 }

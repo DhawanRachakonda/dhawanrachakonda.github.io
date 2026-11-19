@@ -1,0 +1,203 @@
+# Real runs of the three Java apps, 2026-11-19 (live Claude via each app's configured default model, live MongoDB Atlas)
+# Model: all three apps ran claude-sonnet-5-5, the default in each application.yml (Embabel: embabel.models.default-llm, Langchain4j: job-agent.anthropic.model, SpringAI: spring.ai.anthropic.chat.options.model, each ${ANTHROPIC_MODEL:claude-sonnet-5-5}). ANTHROPIC_MODEL was not set in the shell, and each .env contains only ANTHROPIC_API_KEY and MONGO_URI.
+# Each app used its OWN collection in the same database: Embabel jobs_embabel, Langchain4j jobs_langchain4j, SpringAI jobs_springai (the Python app's `jobs` was not touched).
+# Code state: these runs used the main sources of Langchain4j-Job-Agent 847e196, SpringAI-Job-Agent 7b5d055 and Embabel-Job-Agent f3b79e5. The commits made after the runs changed only README text, .env.example and a test-only application.yml, not main code.
+# Apps were started with mvn spring-boot:run on ports 18083 (Langchain4j), 18084 (SpringAI), 18085 (Embabel); requests via POST /chat.
+# Secrets (API key, Mongo URI) are in git-ignored .env files and appear nowhere in this record. Job ids are MongoDB ObjectIds.
+
+### Embabel: complete JD  (real-emb-1.json)
+done=True thread_id=None
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs EmbCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 72/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 72/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #2
+- score_quality: 94/100 (critique in the full replies at the end of this file)
+- publish_job: job_id=6afeccfa69a35c3ec556f3da
+Published job_id: 6afeccfa69a35c3ec556f3da
+
+### Embabel: same JD again  (real-emb-2.json)
+done=True thread_id=None
+Status: rejected
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs EmbCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=6afeccfa69a35c3ec556f3da
+- reject: duplicate of an existing job posting
+
+### Embabel: JD missing fields, first question  (real-emb-3a.json)
+question=What is the location?  thread_id=trusting_bell
+
+### Embabel: after killing and restarting the process, answer 'location' on the old thread  (real-emb-3b.json)
+question=What is the exp?  thread_id=trusting_bell
+
+### Embabel: answer 'exp'  (real-emb-3c.json)
+question=What is the work_mode?  thread_id=trusting_bell
+
+### Embabel: answer 'work_mode' (run completes)  (real-emb-3d.json)
+done=True thread_id=None
+Status: published
+- parse_jd: parsed={title=Data Scientist, company=Globex EmbCheck2, location=, exp=, work_mode=}, missing=[location, exp, work_mode]
+- request_missing_info: got 'location' from the recruiter
+- request_missing_info: got 'exp' from the recruiter
+- request_missing_info: got 'work_mode' from the recruiter
+- check_duplicate: duplicate_of=None
+- score_quality: 32/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 72/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #2
+- score_quality: 94/100 (critique in the full replies at the end of this file)
+- publish_job: job_id=6afecdef0e525dca66d13095
+Published job_id: 6afecdef0e525dca66d13095
+
+### Langchain4j: complete JD  (real-lc4j-1.json)
+done=True thread_id=None
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs LcCheck1, location=Hyderabad, exp=6+ years, work_mode=hybrid}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 68/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 88/100 (critique in the full replies at the end of this file)
+- publish_job: job_id=6afece1f9138dbb1354015a2
+Published job_id: 6afece1f9138dbb1354015a2
+
+### Langchain4j: same JD again  (real-lc4j-2.json)
+done=True thread_id=None
+Status: rejected
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs LcCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=6afece1f9138dbb1354015a2
+- reject: duplicate of an existing job posting
+
+### Langchain4j: JD missing fields, first question  (real-lc4j-3a.json)
+question=What is the location?  thread_id=2397de6c-4682-486d-a7bf-0322a09e5c09
+
+### Langchain4j: after kill and restart, answer 'remote' (last answer; run completes)  (real-lc4j-3-remote.json)
+done=True thread_id=None
+Status: published
+- parse_jd: parsed={title=Data Scientist, company=Globex LcCheck2, location=, exp=, work_mode=}, missing=[location, exp, work_mode]
+- request_missing_info: got 'location' from the recruiter
+- request_missing_info: got 'exp' from the recruiter
+- request_missing_info: got 'work_mode' from the recruiter
+- check_duplicate: duplicate_of=None
+- score_quality: 35/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 90/100 (critique in the full replies at the end of this file)
+- publish_job: job_id=6afece833b20ae86e25f5f48
+Published job_id: 6afece833b20ae86e25f5f48
+
+### SpringAI: complete JD  (real-sai-1.json)
+done=True thread_id=None
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs SaiCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 74/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 68/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #2
+- score_quality: 93/100 (critique in the full replies at the end of this file)
+- publish_job: job_id=6afece41fe94a43b1d189fc4
+Published job_id: 6afece41fe94a43b1d189fc4
+
+### SpringAI: same JD again  (real-sai-2.json)
+done=True thread_id=None
+Status: rejected
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs SaiCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=6afece41fe94a43b1d189fc4
+- reject: duplicate of an existing job posting
+
+### SpringAI: JD missing fields, first question  (real-sai-3a.json)
+question=What is the location?  thread_id=a1149f4b-508f-4e73-98b4-dd044195f892
+
+### SpringAI: after kill and restart, answer 'remote' (last answer; run completes)  (real-sai-3-remote.json)
+done=True thread_id=None
+Status: published
+- parse_jd: parsed={title=Data Scientist, company=Globex SaiCheck2, location=, exp=, work_mode=}, missing=[location, exp, work_mode]
+- request_missing_info: got 'location' from the recruiter
+- request_missing_info: got 'exp' from the recruiter
+- request_missing_info: got 'work_mode' from the recruiter
+- check_duplicate: duplicate_of=None
+- score_quality: 38/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 91/100 (critique in the full replies at the end of this file)
+- publish_job: job_id=6afece92dc27b620a8a5c48d
+Published job_id: 6afece92dc27b620a8a5c48d
+
+### Isolation: Langchain4j receives the job Embabel already published  (real-LangChain4j-isolation.json)
+done=True thread_id=None
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs EmbCheck1, location=Hyderabad, exp=6+ years, work_mode=hybrid}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 72/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 72/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #2
+- score_quality: 92/100 (critique in the full replies at the end of this file)
+- publish_job: job_id=6afeceba3b20ae86e25f5f49
+Published job_id: 6afeceba3b20ae86e25f5f49
+
+### Isolation: SpringAI receives the job Embabel already published  (real-SpringAI-isolation.json)
+done=True thread_id=None
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs EmbCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 72/100 (critique in the full replies at the end of this file)
+- rewrite_jd: revision #1
+- score_quality: 93/100 (critique in the full replies at the end of this file)
+- publish_job: job_id=6afececbdc27b620a8a5c48e
+Published job_id: 6afececbdc27b620a8a5c48e
+
+
+# ===== Full replies of the three 'complete JD' runs (the model's critiques and the log lines, unedited) =====
+
+## Embabel
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs EmbCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 72/100 - The description is clear and specific about the core stack (Java, Spring Boot, Kafka), seniority, location, hybrid schedule, and key responsibilities, and it uses neutral, bias-free language. It would be stronger with a salary range, more detail on the team, product, and reliability goals, and clearer must-have versus nice-to-have skills; the odd company name 'Initech Labs EmbCheck1' also looks like a placeholder or typo.
+- rewrite_jd: revision #1
+- score_quality: 72/100 - The role, tech stack, responsibilities, and qualifications are clear and specific, and the language is inclusive with a solid equal opportunity statement. However, many key details (salary, company description, team size, reliability targets, on-call frequency, benefits, hiring process) are left as unfilled placeholders, which reduces specificity and makes the posting not ready to publish.
+- rewrite_jd: revision #2
+- score_quality: 94/100 - Highly clear and specific, with concrete salary, team structure, measurable reliability targets, on-call details, and a transparent hiring process, and the language is inclusive with an equal opportunity statement. Minor gaps are the lack of explicit guidance on how experience maps to the salary band and the slightly vague 'Prior experience leading projects or on-call practices' nice-to-have; the 'spouse' and 'children' benefit wording is also somewhat narrow.
+- publish_job: job_id=6afeccfa69a35c3ec556f3da
+Published job_id: 6afeccfa69a35c3ec556f3da
+
+## Langchain4j
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs LcCheck1, location=Hyderabad, exp=6+ years, work_mode=hybrid}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 68/100 - The role, location, core stack (Java, Spring Boot, Kafka), experience requirement, and hybrid policy are stated clearly, and the language is neutral and free of obvious bias. However, it lacks specifics on salary range, team and product context, concrete reliability goals, and must-have versus nice-to-have skills, and 'competitive salary' is vague.
+- rewrite_jd: revision #1
+- score_quality: 88/100 - Clear, specific and inclusive: it gives concrete team structure, tech stack, measurable reliability targets, salary range, hybrid schedule and hiring process, with neutral language throughout. Deductions for the unfilled benefits placeholder ('[Add any other benefits...]') and the odd 'LcCheck1' in the company name, which look like leftover template artifacts.
+- publish_job: job_id=6afece1f9138dbb1354015a2
+Published job_id: 6afece1f9138dbb1354015a2
+
+## SpringAI
+Status: published
+- parse_jd: parsed={title=Senior Backend Engineer, company=Initech Labs SaiCheck1, location=Hyderabad, exp=6+ years, work_mode=Hybrid (3 days in office)}, missing=[]
+- check_duplicate: duplicate_of=None
+- score_quality: 74/100 - The role is clear on tech stack (Java, Spring Boot, Kafka), seniority, location, hybrid schedule, and core duties, and the language is free of obvious bias. It would be stronger with a salary range or specifics on benefits, the team and product context, measurable reliability goals, and a clearer company name ("Initech Labs SaiCheck1" looks garbled).
+- rewrite_jd: revision #1
+- score_quality: 68/100 - The role, tech stack, reliability targets, and hybrid schedule are specific and clearly written, and the language is inclusive and free of obvious bias. However, many unfilled placeholders (company/product description, team size, manager title, compensation, benefits, application link) make it unpublishable and vague on key details, and the 6+ years requirement plus bracketed targets reduce specificity.
+- rewrite_jd: revision #2
+- score_quality: 93/100 - The description is clear, specific and inclusive: it gives concrete metrics, team size, on-call load, a salary range, benefits and a skills-focused equal-opportunity statement. It could be stronger by clarifying the on-call and reliability targets as team versus individual goals, spelling out the 'Senior' scope and the interview process, and avoiding vague phrases like 'most successful candidates' for the experience expectation.
+- publish_job: job_id=6afece41fe94a43b1d189fc4
+Published job_id: 6afece41fe94a43b1d189fc4
+
+
+# ===== The exact request texts sent to POST /chat (message field), 2026-11-19 =====
+# COMPLETE job description (the company name differs per app so that the apps' own checks start clean:
+# "Initech Labs EmbCheck1" for Embabel, "Initech Labs LcCheck1" for Langchain4j, "Initech Labs SaiCheck1" for SpringAI):
+We are hiring a Senior Backend Engineer at Initech Labs <COMPANY> in Hyderabad. You need 6+ years of experience building Java microservices with Spring Boot and Kafka. The role is hybrid (3 days in office). You will design and own APIs, mentor two junior engineers, and improve reliability. Competitive salary and health insurance.
+
+# JOB DESCRIPTION MISSING location, experience and work mode (company: Globex EmbCheck2 / Globex LcCheck2 / Globex SaiCheck2):
+Data Scientist wanted at Globex <COMPANY>. Build forecasting models and work with product teams. Strong Python and SQL skills.
+
+# Answers typed to the questions (in order): "Bangalore" (Embabel and the other two), "3+ years", "remote".
+# Isolation check: the Embabel COMPLETE text (company "Initech Labs EmbCheck1") was sent unchanged to the Langchain4j and SpringAI apps.
+
+
+# ===== Isolation check, Embabel side (captured from the command output; not saved as a JSON file) =====
+# The same COMPLETE text with company "Initech Labs EmbCheck1" was sent to the Embabel app a third time, after the other two apps had accepted it:
+Status: rejected
+- check_duplicate: duplicate_of=6afeccfa69a35c3ec556f3da
+# (6afeccfa69a35c3ec556f3da is the job id that Embabel published in the first run above, so its own collection still held the original.)

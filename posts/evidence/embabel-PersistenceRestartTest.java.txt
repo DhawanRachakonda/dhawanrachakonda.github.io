@@ -58,7 +58,7 @@ class PersistenceRestartTest extends EmbabelMockitoIntegrationTest {
 
     @Test
     void pausedRunCanBeResumedByAFreshApplicationContext() {
-        whenCreateObject(p -> p.contains("Extract these fields"), ExtractedFields.class).thenReturn(
+        whenCreateObject(p -> p.contains("Extract the job posting details"), ExtractedFields.class).thenReturn(
                 new ExtractedFields("SRE", "Globex", "", "", ""));
 
         var first = pipeline.start("We need an SRE at Globex.");

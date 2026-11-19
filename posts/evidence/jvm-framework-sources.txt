@@ -13,3 +13,15 @@
 ## LangGraph4j README  https://raw.githubusercontent.com/langgraph4j/langgraph4j/main/README.md
 line 8: "LangGraph for Java. A library for building stateful, multi-agents applications with LLMs, built for work with [langchain4j] and [Spring AI]"
 line 417: "As default use case to proof [Spring AI] integration, We have implemented **AgentExecutor (aka ReACT Agent)** using LangGraph4j."
+
+## LangChain4j agentic module  https://docs.langchain4j.dev/tutorials/agents
+"the whole module has to be considered experimental and is subject to change in future releases."
+(the page also documents sequential, loop, conditional and parallel workflows, a HumanInTheLoop agent, and recoverability with an AgenticScopeStore; maven artifact dev.langchain4j:langchain4j-agentic, latest 1.24.0-beta34 on 2026-11-19)
+
+## Spring AI workflow patterns  https://docs.spring.io/spring-ai/reference/api/effective-agents.html
+"Workflows: Systems where LLMs and tools are orchestrated through predefined code paths (e.g., prescriptive systems)"
+The page shows chain, parallelization, routing, orchestrator-workers and evaluator-optimizer as ordinary Java classes. It does not mention a workflow engine, human-in-the-loop or persistence/resume (absence checked in the page text on 2026-11-19).
+
+## LangGraph4j Spring AI agent executor  https://github.com/langgraph4j/langgraph4j/blob/main/spring-ai/spring-ai-agent/README.md
+"`langgraph4j-springai-agentexecutor` provides ReAct-style agents built on LangGraph4j and Spring AI `ChatModel`. Use it when you want a ready-to-run agent loop with tool callbacks, streaming output, approvals, or sub-agents instead of wiring every node manually."
+(It offers `AgentExecutor`, a compact ReAct graph with agent -> action -> agent execution, and `AgentExecutorEx`, with explicit tool-dispatch nodes, approval gates and richer orchestration.)

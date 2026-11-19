@@ -1,12 +1,16 @@
 package jobagent;
 
 import com.embabel.agent.api.annotation.State;
+import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Domain types for the JD intake workflow.
@@ -30,7 +34,13 @@ public final class JdDomain {
     public record RawJd(String text) {}
 
     /** Structured LLM output for extraction. Empty string means "not mentioned". */
-    public record ExtractedFields(String title, String company, String location, String exp, String workMode) {}
+    public record ExtractedFields(String title, String company, String location, String exp, String workMode) {
+
+        /** The same values in the record that carries the validation constraints. */
+        public RequiredFields toRequiredFields() {
+            return new RequiredFields(title, company, location, exp, workMode);
+        }
+    }
 
     /**
      * The five fields a job needs before it can be checked and published, as Jakarta Bean Validation
@@ -44,7 +54,29 @@ public final class JdDomain {
             @NotBlank String company,
             @NotBlank String location,
             @NotBlank String exp,
-            @NotBlank String workMode) {}
+            @NotBlank String workMode) {
+
+        /** The values by field name, in the order the recruiter is asked. */
+        public Map<String, String> asMap() {
+            Map<String, String> m = new LinkedHashMap<>();
+            m.put("title", Objects.toString(title, ""));
+            m.put("company", Objects.toString(company, ""));
+            m.put("location", Objects.toString(location, ""));
+            m.put("exp", Objects.toString(exp, ""));
+            m.put("work_mode", Objects.toString(workMode, ""));
+            return m;
+        }
+
+        /** The fields that fail their constraints (the missing ones), in the order the recruiter is asked. */
+        public List<String> missing(Validator validator) {
+            Set<String> violated = validator.validate(this).stream()
+                    .map(v -> v.getPropertyPath().toString())
+                    .collect(Collectors.toSet());
+            return REQUIRED_FIELDS.stream()
+                    .filter(f -> violated.contains("work_mode".equals(f) ? "workMode" : f))
+                    .toList();
+        }
+    }
 
     /** Structured LLM output for scoring. */
     public record QualityScore(int score, String feedback) {}

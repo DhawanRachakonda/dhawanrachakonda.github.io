@@ -70,8 +70,9 @@ public class JdIntakePipeline {
     private static final BeanOutputConverter<QualityScore> SCORE = new BeanOutputConverter<>(QualityScore.class);
 
     Map<String, Object> parseJd(JdState state) {
-        String prompt = "Extract these fields from the job description below, using an empty string for any "
-                + "field that isn't clearly mentioned: title, company, location, exp, workMode.\n\n"
+        // No field list here: the ExtractedFields record's schema is appended by the converter (EXTRACT.getFormat()).
+        String prompt = "Extract the job posting details from the job description below. Use an empty string for "
+                + "anything it does not clearly mention.\n\n"
                 + "Job description:\n" + state.rawJd();
         // An API failure (bad key, network) propagates. Only a reply that can't be read as the
         // record is treated as "nothing extracted", so the recruiter is asked for every field.

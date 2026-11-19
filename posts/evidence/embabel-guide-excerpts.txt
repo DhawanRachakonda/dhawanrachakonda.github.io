@@ -41,3 +41,8 @@
 
 ## 4.38.7  https://docs.embabel.com/embabel-agent/guide/1.5.4/#relationship-with-other-validation-mechanisms
 "The Agent API framework supports Jakarta Bean Validation (JSR-380) for domain object constraints. These constraints are injected into the schema and validated during object construction."
+
+
+## 4.25.6  https://docs.embabel.com/embabel-agent/guide/1.5.4/#reference.llms.native-structured-output (Advanced Feature: Native Structured Output)
+"Embabel generates the JSON Schema, decides whether the native path is enabled for a call, and parses the final response into the requested object."
+"Anthropic native structured output is currently disabled by default until its semantics are verified."
