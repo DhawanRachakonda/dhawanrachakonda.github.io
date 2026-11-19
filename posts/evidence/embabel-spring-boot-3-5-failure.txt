@@ -1,0 +1,12 @@
+# Embabel 1.5.4 on Spring Boot 3.5.7, 2026-11-19
+# Setup: copy of Embabel-Job-Agent commit 7a2a21b with the spring-boot-starter-parent version changed from 4.0.9 to 3.5.7; ran: mvn test -Dtest=JdIntakeAgentTest#completeJdIsPublished
+# Excerpt of the Maven output:
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.086 s <<< FAILURE! -- in jobagent.JdIntakeAgentTest
+[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0
+[INFO] BUILD FAILURE
+exit 1
+14:20:22.891 [main] WARN  GenericWebApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: java.lang.IllegalStateException: Failed to generate bean name for imported class 'org.springframework.ai.model.chat.clien
+Caused by: java.lang.ClassNotFoundException: org.springframework.ai.model.tool.autoconfigure.ToolCallingAutoConfiguration
+Caused by: java.lang.IllegalArgumentException: Could not find class [org.springframework.ai.model.tool.autoconfigure.ToolCallingAutoConfiguration]
+Caused by: java.lang.IllegalStateException: Failed to generate bean name for imported class 'org.springframework.ai.model.chat.client.autoconfigure.ChatClientAutoConfiguration'
+java.lang.IllegalStateException: Failed to generate bean name for imported class 'org.springframework.ai.model.chat.client.autoconfigure.ChatClientAutoConfiguration'

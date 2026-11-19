@@ -1,0 +1,25 @@
+# Line counts (wc -l), 2026-11-19. Comments, blank lines and the CLI/web code are included, so this is a rough size, not a quality measure.
+  355 Langgraph-Job-Agent/jd_intake_pipeline.py
+   30 Langchain4j-Job-Agent/src/main/java/jobagent/InMemoryJobStore.java
+  345 Langchain4j-Job-Agent/src/main/java/jobagent/JdIntakePipeline.java
+   54 Langchain4j-Job-Agent/src/main/java/jobagent/JdState.java
+   14 Langchain4j-Job-Agent/src/main/java/jobagent/JobStore.java
+   61 Langchain4j-Job-Agent/src/main/java/jobagent/MongoJobStore.java
+  120 Langchain4j-Job-Agent/src/main/java/jobagent/WebServer.java
+   50 Embabel-Job-Agent/src/main/java/jobagent/ChatController.java
+   57 Embabel-Job-Agent/src/main/java/jobagent/FormRequestSerializer.java
+   30 Embabel-Job-Agent/src/main/java/jobagent/InMemoryJobStore.java
+  114 Embabel-Job-Agent/src/main/java/jobagent/JdDomain.java
+  182 Embabel-Job-Agent/src/main/java/jobagent/JdIntakeAgent.java
+   11 Embabel-Job-Agent/src/main/java/jobagent/JobAgentApplication.java
+   17 Embabel-Job-Agent/src/main/java/jobagent/JobAgentConfig.java
+   14 Embabel-Job-Agent/src/main/java/jobagent/JobStore.java
+   57 Embabel-Job-Agent/src/main/java/jobagent/MongoJobStore.java
+   83 Embabel-Job-Agent/src/main/java/jobagent/PipelineService.java
+ 1594 total
+
+## Whole-project scope (all main source files)
+  355 Langgraph-Job-Agent/jd_intake_pipeline.py
+   56 Langgraph-Job-Agent/app.py
+   52 Langgraph-Job-Agent/jobs_db.py
+  463 total
